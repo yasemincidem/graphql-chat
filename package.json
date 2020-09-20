@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "webpack --config webpack.config.js",
     "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
-    "server": "nodemon src/api/index.js",
+    "server": "nodemon ./api/index.js",
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "lint:all": "eslint 'src/**/*.{js,jsx}'",
     "format:all": "prettier --write ./src/**/*.{js,jsx}"
@@ -25,6 +26,7 @@
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^4.3.0",
+    "dotenv-webpack": "^2.0.0",
     "eslint": "^7.9.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-config-prettier": "^6.11.0",
@@ -38,7 +40,8 @@
     "url-loader": "^4.1.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "webpackbar": "^4.0.0"
   },
   "dependencies": {
     "react": "^16.13.1",
