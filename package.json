@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --config webpack.config.js",
-    "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
-    "server": "nodemon ./api/index.js",
-    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "start:app": "webpack-dev-server --mode development --devtool inline-source-map --hot",
+    "start:server": "nodemon ./api/index.js",
+    "start:all": "concurrently \"yarn run start:app\" \"yarn run start:server\"",
     "lint:all": "eslint 'src/**/*.{js,jsx}'",
     "format:all": "prettier --write ./src/**/*.{js,jsx}"
   },
@@ -45,6 +44,9 @@
   },
   "dependencies": {
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "cors": "^2.8.5",
+    "graphql-yoga": "^1.18.3",
+    "helmet": "^4.1.1"
   }
 }

@@ -1,7 +1,6 @@
 const { GraphQLServer, PubSub } = require('graphql-yoga');
 const cors = require('cors');
 const helmet = require('helmet');
-const createLoaders = require('./dataLoader');
 
 const typeDefs = `
   type Query {
@@ -20,7 +19,6 @@ const corsOptions = {
 }
 const options = {
   port: 4000,
-  endpoint: '/gql',
   cors: corsOptions
 };
 const pubsub = new PubSub();
@@ -30,7 +28,6 @@ const server = new GraphQLServer({
   context: async req => ({
     ...req,
     pubsub,
-    loaders: createLoaders(),
   })
 });
 server.start(options, ({ port }) => console.log(`Server is running on localhost: ${process.env.NODE_ENV}`));
