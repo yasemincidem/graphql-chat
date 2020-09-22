@@ -1,6 +1,8 @@
 type User {
     _id: ID!,
-    email: String
+    email: String,
+    name: String,
+    surname: String,
 }
 type AuthPayload {
     token: String!,
@@ -9,11 +11,13 @@ type AuthPayload {
 input AuthInput {
     email: String!,
     password: String!,
+    name: String!,
+    surname: String!,
 }
 type Mutation {
     signup(input: AuthInput!): AuthPayload!,
     login(input: AuthInput!): AuthPayload!
 }
 type Query {
-  dummy: String
+  getUser(id: ID!): User!
 }

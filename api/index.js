@@ -9,7 +9,7 @@ const auth = require('./auth');
 const channel = require('./channel');
 const requireAuth = require('./middlewares/auth.middleware');
 
-mongoose.connect(config.mongo.host, {useNewUrlParser: true});
+mongoose.connect(config.mongo.host, { useNewUrlParser: true });
 const resolvers = {
   Query: {
     hello: (_, { name }) => `Hello ${name || 'World'}`,
@@ -17,24 +17,24 @@ const resolvers = {
 };
 const corsOptions = {
   origin: config.env,
-  credentials: true
-}
+  credentials: true,
+};
 const options = {
   port: 4000,
-  cors: corsOptions
+  cors: corsOptions,
 };
 const pubsub = new PubSub();
 const server = new GraphQLServer({
-  typeDefs: [auth.typeDefs, channel.typeDefs].join(" "),
+  typeDefs: [auth.typeDefs, channel.typeDefs].join(' '),
   resolvers: merge({}, auth.resolvers, channel.resolvers),
   middlewares: [requireAuth],
-  context: async req => ({
+  context: async (req) => ({
     ...req,
     pubsub,
     models: {
       user: auth.model,
-      channel: channel.model
-    }
-  })
+      channel: channel.model,
+    },
+  }),
 });
 server.start(options, ({ port }) => console.log(`Server is running on localhost: ${config.env}`));
