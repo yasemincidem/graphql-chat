@@ -6,6 +6,8 @@ const helmet = require('helmet');
 const { merge } = require('lodash');
 const config = require('./config');
 const auth = require('./auth');
+const channel = require('./channel');
+const requireAuth = require('./middlewares/auth.middleware');
 
 mongoose.connect(config.mongo.host, {useNewUrlParser: true});
 const resolvers = {
@@ -23,13 +25,15 @@ const options = {
 };
 const pubsub = new PubSub();
 const server = new GraphQLServer({
-  typeDefs: [auth.typeDefs].join(" "),
-  resolvers: merge({}, auth.resolvers),
+  typeDefs: [auth.typeDefs, channel.typeDefs].join(" "),
+  resolvers: merge({}, auth.resolvers, channel.resolvers),
+  middlewares: [requireAuth],
   context: async req => ({
     ...req,
     pubsub,
     models: {
-      user: auth.model
+      user: auth.model,
+      channel: channel.model
     }
   })
 });

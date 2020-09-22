@@ -1,5 +1,4 @@
 const path = require('path');
-var nodeExternals = require('webpack-node-externals');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const DotenvPlugin = require('dotenv-webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');

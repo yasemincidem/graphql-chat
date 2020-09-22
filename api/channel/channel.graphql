@@ -1,0 +1,16 @@
+type Channel {
+    name: String!,
+    countOfUsers: Int,
+    users: [User]
+}
+input ChannelInput {
+    name: String!,
+    description: String,
+}
+extend type Mutation {
+    createChannel(input: ChannelInput!): Channel!,
+}
+extend type Query {
+    allChannels: [Channel],
+    getChannel(name: String!): Channel,
+}
