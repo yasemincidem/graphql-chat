@@ -105,3 +105,6 @@ dist
 
 # history 
 .history/
+
+# idea 
+.idea/

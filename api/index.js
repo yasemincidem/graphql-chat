@@ -1,20 +1,20 @@
+require('dotenv').config();
 const { GraphQLServer, PubSub } = require('graphql-yoga');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
+const { merge } = require('lodash');
+const config = require('./config');
+const auth = require('./auth');
 
-const typeDefs = `
-  type Query {
-    hello(name: String): String!
-  }
-`;
-
+mongoose.connect(config.mongo.host, {useNewUrlParser: true});
 const resolvers = {
   Query: {
     hello: (_, { name }) => `Hello ${name || 'World'}`,
   },
 };
 const corsOptions = {
-  origin: process.env.NODE_ENV === "development" ? process.env.CLIENT_URL_DEV : process.env.CLIENT_URL_PROD,
+  origin: config.env,
   credentials: true
 }
 const options = {
@@ -23,11 +23,14 @@ const options = {
 };
 const pubsub = new PubSub();
 const server = new GraphQLServer({
-  typeDefs,
-  resolvers,
+  typeDefs: [auth.typeDefs].join(" "),
+  resolvers: merge({}, auth.resolvers),
   context: async req => ({
     ...req,
     pubsub,
+    models: {
+      user: auth.model
+    }
   })
 });
-server.start(options, ({ port }) => console.log(`Server is running on localhost: ${process.env.NODE_ENV}`));
+server.start(options, ({ port }) => console.log(`Server is running on localhost: ${config.env}`));

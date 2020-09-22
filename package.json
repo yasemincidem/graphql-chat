@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build:dev": "webpack --mode=development",
     "start:app": "webpack-dev-server --mode development --devtool inline-source-map --hot",
     "start:server": "nodemon ./api/index.js",
     "start:all": "concurrently \"yarn run start:app\" \"yarn run start:server\"",
@@ -25,6 +26,7 @@
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^4.3.0",
+    "dotenv": "8.2.0",
     "dotenv-webpack": "^2.0.0",
     "eslint": "^7.9.0",
     "eslint-config-airbnb": "^18.2.0",
@@ -34,19 +36,18 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.6",
     "html-webpack-plugin": "^4.4.1",
+    "lodash": "4.17.20",
     "prettier": "^2.1.2",
     "style-loader": "^1.2.1",
     "url-loader": "^4.1.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
+    "webpack-node-externals": "^2.5.2",
     "webpackbar": "^4.0.0"
   },
   "dependencies": {
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "cors": "^2.8.5",
-    "graphql-yoga": "^1.18.3",
-    "helmet": "^4.1.1"
+    "react-dom": "^16.13.1"
   }
 }
