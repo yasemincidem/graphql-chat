@@ -18,9 +18,11 @@ const requireAuth = async (resolve, root, args, ctx, info) => {
 module.exports = {
   Mutation: {
     createChannel: requireAuth,
+    addPeopleToChannel: requireAuth,
+    sendMessageToChannel: requireAuth,
   },
   Query: {
-    allChannels: requireAuth,
-    getChannel: requireAuth,
+    channels: requireAuth,
+    channel: requireAuth
   },
 };

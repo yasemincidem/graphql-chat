@@ -6,9 +6,22 @@ const ChannelSchema = new Schema({
     required: true,
     unique: true,
   },
+  description: {
+    type: String,
+    required: false
+  },
+  created_at: {
+    type: String,
+    required: true
+  },
   users: {
     type: [Object],
     ref: 'User',
+    required: true,
+  },
+  posts: {
+    type: [Object],
+    ref: 'Post',
     required: false,
   },
 });

@@ -8,6 +8,8 @@ const config = require('./config');
 const auth = require('./auth');
 const channel = require('./channel');
 const requireAuth = require('./middlewares/auth.middleware');
+const batchChannels = require('./dataLoader');
+const dataLoader = require('./dataLoader');
 
 mongoose.connect(config.mongo.host, { useNewUrlParser: true });
 const resolvers = {
@@ -35,6 +37,7 @@ const server = new GraphQLServer({
       user: auth.model,
       channel: channel.model,
     },
+    loader: dataLoader
   }),
 });
 server.start(options, ({ port }) => console.log(`Server is running on localhost: ${config.env}`));
