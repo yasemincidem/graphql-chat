@@ -19,7 +19,6 @@ module.exports = {
   Mutation: {
     createChannel: requireAuth,
     addPeopleToChannel: requireAuth,
-    sendMessageToChannel: requireAuth,
   },
   Query: {
     channels: requireAuth,

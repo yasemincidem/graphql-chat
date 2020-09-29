@@ -1,0 +1,14 @@
+type Post {
+    text: String!
+    created_at: String!
+    from: String!
+    to: String!
+}
+input PostInput {
+    to: String!
+    from: String!
+    text: String!
+}
+extend type Mutation {
+    sendMessage(input: PostInput!): [Post!]
+}

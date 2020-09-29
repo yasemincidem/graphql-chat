@@ -1,44 +1,38 @@
 type PageInfo {
-    hasPreviousPage: Boolean!,
-    hasNextPage: Boolean!,
-    matchCount: Int,
+    hasPreviousPage: Boolean!
+    hasNextPage: Boolean!
 }
 type ChannelPostsConnection {
   pageInfo: PageInfo!
-  edges: [ChannelPostsEdge]
+  edges: [ChannelPostsEdge!]!
+  totalCount: Int
 }
 type ChannelPostsEdge {
+  node: Post!
   cursor: String!
-  node: Post
-}
-type Post {
-    text: String!,
-    createdAt: String!,
-    from: String!,
 }
 type Channel {
-    _id: ID!,
-    name: String!,
-    description: String,
-    created_at: String,
-    users: [User]!,
-    posts: [Post],
+    _id: ID!
+    name: String!
+    description: String
+    created_at: String
+    users: [User]!
+    posts: [Post]!
 }
 input ChannelInput {
-    name: String!,
-    description: String,
-    email: String,
+    name: String!
+    description: String
+    email: String
 }
 input ChannelUserInput {
-    email: String!,
-    channelId: ID!,
+    email: String!
+    channelId: ID!
 }
 extend type Mutation {
-    createChannel(input: ChannelInput!): Channel!,
-    addPeopleToChannel(input: ChannelUserInput!): Channel!,
-    sendMessageToChannel(channelId: String!, from: String!, text: String!): Channel!,
+    createChannel(input: ChannelInput!): Channel!
+    addPeopleToChannel(input: ChannelUserInput!): Channel!
 }
 extend type Query {
-    channels: [Channel],
-    channel(id: String!): Channel,
+    channels: [Channel]
+    channel(id: String!): Channel
 }

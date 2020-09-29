@@ -36,16 +36,6 @@ const addPeopleToChannel = async (_, { input }, ctx) => {
   );
   return channel;
 };
-const sendMessageToChannel = async (_, { channelId, from, text }, ctx) => {
-  const channel = await ctx.models.channel.findOne({ _id: channelId });
-  const posts = [...channel.posts, { from, text, created_at: new Date().getTime() }];
-  const result = await ctx.models.channel.findByIdAndUpdate(
-    { _id: channelId },
-    { posts },
-    { new: true },
-  );
-  return result;
-};
 const channels = async (_, {}, ctx) => {
   const channels = await ctx.models.channel.find({});
   return channels;
@@ -58,7 +48,6 @@ module.exports = {
   Mutation: {
     createChannel,
     addPeopleToChannel,
-    sendMessageToChannel,
   },
   Query: {
     channels,
@@ -66,5 +55,6 @@ module.exports = {
   },
   Channel: {
     users: async (channel, args, ctx) => await ctx.loader.loaderChannelUsers().load(channel.users),
+    posts: async (channel, args, ctx) => await ctx.loader.loaderChannelPosts().load(channel._id),
   },
 };

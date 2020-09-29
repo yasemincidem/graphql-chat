@@ -7,6 +7,7 @@ const { merge } = require('lodash');
 const config = require('./config');
 const auth = require('./auth');
 const channel = require('./channel');
+const post = require('./post');
 const requireAuth = require('./middlewares/auth.middleware');
 const batchChannels = require('./dataLoader');
 const dataLoader = require('./dataLoader');
@@ -27,8 +28,8 @@ const options = {
 };
 const pubsub = new PubSub();
 const server = new GraphQLServer({
-  typeDefs: [auth.typeDefs, channel.typeDefs].join(' '),
-  resolvers: merge({}, auth.resolvers, channel.resolvers),
+  typeDefs: [auth.typeDefs, post.typeDefs, channel.typeDefs].join(' '),
+  resolvers: merge({}, auth.resolvers, post.resolvers, channel.resolvers),
   middlewares: [requireAuth],
   context: async (req) => ({
     ...req,
@@ -36,6 +37,7 @@ const server = new GraphQLServer({
     models: {
       user: auth.model,
       channel: channel.model,
+      post: post.model,
     },
     loader: dataLoader
   }),
