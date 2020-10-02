@@ -19,10 +19,11 @@ const batchChannelPosts = async (keys) => {
   if (before !== undefined) {
     const buff = new Buffer(before, 'base64');
     const cursorId = buff.toString('ascii');
-    results = await Posts.find({ _id: { $gt: cursorId }, to: id }).limit(last);
-    results.sort((a, b) => b.created_at - a.created_at);
+    results = await Posts.find({ _id: { $lt: cursorId }, to: id })
+      .limit(last)
+      .sort({ created_at: -1 });
   } else {
-    results = await Posts.find({ to: id }).sort({ created_at: -1 }).limit(last);
+    results = await Posts.find({ to: id }).limit(last).sort({ created_at: -1 });
   }
   const edges = results.map((post) => {
     const buffer = new Buffer(post.id);
