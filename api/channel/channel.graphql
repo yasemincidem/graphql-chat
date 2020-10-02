@@ -1,11 +1,10 @@
 type PageInfo {
     hasPreviousPage: Boolean!
-    hasNextPage: Boolean!
+    matchCount: Int,
 }
 type ChannelPostsConnection {
   pageInfo: PageInfo!
   edges: [ChannelPostsEdge!]!
-  totalCount: Int
 }
 type ChannelPostsEdge {
   node: Post!
@@ -17,7 +16,7 @@ type Channel {
     description: String
     created_at: String
     users: [User]!
-    posts: [Post]!
+    posts(last: Int!, before: String): ChannelPostsConnection!
 }
 input ChannelInput {
     name: String!

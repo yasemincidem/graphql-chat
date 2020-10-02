@@ -55,6 +55,7 @@ module.exports = {
   },
   Channel: {
     users: async (channel, args, ctx) => await ctx.loader.loaderChannelUsers().load(channel.users),
-    posts: async (channel, args, ctx) => await ctx.loader.loaderChannelPosts().load(channel._id),
+    posts: async (channel, args, ctx) =>
+      await ctx.loader.loaderChannelPosts().load({ id: channel._id, args }),
   },
 };
