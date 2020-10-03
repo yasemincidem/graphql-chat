@@ -12,3 +12,6 @@ input PostInput {
 extend type Mutation {
     sendMessage(input: PostInput!): [Post!]
 }
+type Subscription {
+    newMessage: Post!,
+}
