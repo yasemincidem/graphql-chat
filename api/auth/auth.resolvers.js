@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const config = require('../config');
+const config = require('../../config');
 
 const signup = async (_, { input }, ctx) => {
   const { password, email, name, surname } = input;

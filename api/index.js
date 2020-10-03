@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const { merge } = require('lodash');
-const config = require('./config');
+const config = require('../config');
 const auth = require('./auth');
 const channel = require('./channel');
 const post = require('./post');
@@ -17,14 +17,6 @@ const resolvers = {
   Query: {
     hello: (_, { name }) => `Hello ${name || 'World'}`,
   },
-};
-const corsOptions = {
-  origin: config.env,
-  credentials: true,
-};
-const options = {
-  port: 4000,
-  cors: corsOptions,
 };
 const pubsub = new PubSub();
 const server = new GraphQLServer({
@@ -42,4 +34,5 @@ const server = new GraphQLServer({
     loader: dataLoader
   }),
 });
-server.start(options, ({ port }) => console.log(`Server is running on localhost: ${config.env}`));
+
+module.exports = server;

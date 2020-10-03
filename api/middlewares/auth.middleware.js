@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config');
+const config = require('../../config');
 const { resolveConfigFile } = require('prettier');
 
 const requireAuth = async (resolve, root, args, ctx, info) => {

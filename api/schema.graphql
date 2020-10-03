@@ -1,0 +1,85 @@
+input AuthInput {
+  email: String!
+  password: String!
+  name: String!
+  surname: String!
+}
+
+type AuthPayload {
+  token: String!
+  user: User
+}
+
+type Channel {
+  _id: ID!
+  name: String!
+  description: String
+  created_at: String
+  users: [User]!
+  posts(last: Int!, before: String): ChannelPostsConnection!
+}
+
+input ChannelInput {
+  name: String!
+  description: String
+  email: String
+}
+
+type ChannelPostsConnection {
+  pageInfo: PageInfo!
+  edges: [ChannelPostsEdge!]!
+}
+
+type ChannelPostsEdge {
+  node: Post!
+  cursor: String!
+}
+
+input ChannelUserInput {
+  email: String!
+  channelId: ID!
+}
+
+type Mutation {
+  signup(input: AuthInput!): AuthPayload!
+  login(input: AuthInput!): AuthPayload!
+  sendMessage(input: PostInput!): [Post!]
+  createChannel(input: ChannelInput!): Channel!
+  addPeopleToChannel(input: ChannelUserInput!): Channel!
+}
+
+type PageInfo {
+  hasPreviousPage: Boolean!
+  matchCount: Int
+}
+
+type Post {
+  text: String!
+  created_at: String!
+  from: String!
+  to: String!
+}
+
+input PostInput {
+  to: String!
+  from: String!
+  text: String!
+}
+
+type Query {
+  getUser(id: ID!): User!
+  channels: [Channel]
+  channel(id: String!): Channel
+}
+
+type Subscription {
+  newMessage: Post!
+}
+
+type User {
+  _id: ID!
+  email: String
+  name: String
+  surname: String
+}
+
