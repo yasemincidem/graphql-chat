@@ -43,6 +43,6 @@ const config = {
   output: {
     path: path.join(__dirname, 'dir'),
     filename: 'bundle.js',
-  },
+  }
 };
 module.exports = config;

@@ -13,9 +13,5 @@ module.exports = {
       },
     ],
     '@babel/preset-react',
-  ],
-  plugins: [
-    // Relay plugin should be at top of the other plugins
-    'relay'
   ]
 }

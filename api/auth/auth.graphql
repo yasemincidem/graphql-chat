@@ -11,8 +11,8 @@ type AuthPayload {
 input AuthInput {
     email: String!,
     password: String!,
-    name: String!,
-    surname: String!,
+    name: String,
+    surname: String,
 }
 type Mutation {
     signup(input: AuthInput!): AuthPayload!,
