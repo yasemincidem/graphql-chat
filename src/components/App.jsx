@@ -5,6 +5,7 @@ import { setContext } from '@apollo/client/link/context';
 import Channels from './Channel';
 import Login from './Auth/login';
 import Register from './Auth/register';
+import Navbar from './Navbar';
 
 const httpLink = createHttpLink({
   uri: 'http://localhost:8000/gql',
@@ -32,9 +33,9 @@ const App = () => {
       <Router>
         <Switch>
           <Route path="/channels" component={!isAuthed ? Login : Channels} />
-          <Route path="/login" component={!isAuthed ? Login : Login} />
+          <Route path="/login" component={Login} />
           <Route path="/register" component={!isAuthed ? Register : Login} />
-          <Route path="/" exact component={!isAuthed ? Login : Login} />
+          <Route path="/" exact component={Login} />
         </Switch>
       </Router>
     </ApolloProvider>

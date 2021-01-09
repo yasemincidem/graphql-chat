@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TextField,
   Container,
@@ -7,7 +7,7 @@ import {
   Grid,
   Button,
   Avatar,
-  Link
+  Link,
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -36,10 +36,13 @@ const Login = () => {
   if (error) {
     throw new Error('Fetching error in login mutation');
   }
-  if (data) {
-    localStorage.setItem('token', data.login.token);
-    history.push('/channels');
-  }
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem('token', data.login.token);
+      history.push('/channels');
+    }
+  }, [data]);
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
