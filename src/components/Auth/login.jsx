@@ -6,14 +6,12 @@ import {
   Typography,
   Grid,
   Button,
-  Avatar,
-  makeStyles,
-  Link,
-  Box,
+  Avatar
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { useMutation, gql, from } from '@apollo/client';
+import { useMutation, gql } from '@apollo/client';
+import { useLoginStyles } from './styles';
 
 const LOG_IN = gql`
   mutation Login($input: AuthInput!) {
@@ -29,35 +27,15 @@ const LOG_IN = gql`
   }
 `;
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 const Login = () => {
-  const classes = useStyles();
+  const classes = useLoginStyles();
   const [input, setInput] = useState({});
   const [login, { loading, error, data }] = useMutation(LOG_IN);
   const history = useHistory();
   if (error) {
-    throw new Error('Fettching error in login mutation');
+    throw new Error('Fetching error in login mutation');
   }
   if (data) {
-    console.log('ssss');
     localStorage.setItem('token', data.login.token);
     history.push('/channels');
   }
@@ -114,15 +92,8 @@ const Login = () => {
               });
             }}
           >
-            Sign Up
+            Sign in
           </Button>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link href="#" variant="body2">
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
         </div>
       </div>
     </Container>

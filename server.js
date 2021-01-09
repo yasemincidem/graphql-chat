@@ -1,9 +1,8 @@
+const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const server = require('./api/index');
-const config = require('./config');
 const webpackConfig = require('./webpack.config');
-const { findLastKey } = require('lodash');
 
 const APP_PORT = 8000;
 const compiler = webpack(webpackConfig);
@@ -27,6 +26,11 @@ const serverOptions = {
 server.start(serverOptions, ({ port }) =>
   console.log(`Server is running on http://localhost: ${port}`),
 );
+server.express.use('/index.html', (req, res) => {
+  res.statusCode = '302'; // eslint-disable-line no-param-reassign
+  res.end();
+});
 app.listen(APP_PORT, () => {
   console.log(`App is now running on http://localhost:${APP_PORT}`);
 });
+
