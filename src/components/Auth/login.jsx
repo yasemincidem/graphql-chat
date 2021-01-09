@@ -6,7 +6,8 @@ import {
   Typography,
   Grid,
   Button,
-  Avatar
+  Avatar,
+  Link
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -94,6 +95,13 @@ const Login = () => {
           >
             Sign in
           </Button>
+          <Grid container justify="flex-end">
+            <Grid item>
+              <Link href="register" variant="body2">
+                Don't have an account? Register Now!
+              </Link>
+            </Grid>
+          </Grid>
         </div>
       </div>
     </Container>

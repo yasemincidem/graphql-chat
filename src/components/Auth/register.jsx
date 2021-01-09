@@ -28,7 +28,7 @@ const SIGN_UP = gql`
   }
 `;
 
-const Signup = () => {
+const Register = () => {
   const classes = useSignupStyles();
   const [input, setInput] = useState({});
   const [signup, {loading, error, data}] = useMutation(SIGN_UP);
@@ -131,4 +131,4 @@ const Signup = () => {
     </Container>
   );
 };
-export default Signup;
+export default Register;

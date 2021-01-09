@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider, InMemoryCache, ApolloClient, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import Channels from './Channel';
-import Signup from './Auth/signup';
 import Login from './Auth/login';
+import Register from './Auth/register';
 
 const httpLink = createHttpLink({
   uri: 'http://localhost:8000/gql',
@@ -33,7 +33,7 @@ const App = () => {
         <Switch>
           <Route path="/channels" component={!isAuthed ? Login : Channels} />
           <Route path="/login" component={!isAuthed ? Login : Login} />
-          <Route path="/signup" component={!isAuthed ? Login : Signup} />
+          <Route path="/register" component={!isAuthed ? Register : Login} />
           <Route path="/" exact component={!isAuthed ? Login : Login} />
         </Switch>
       </Router>

@@ -41,8 +41,20 @@ const config = {
     }),
   ],
   output: {
-    path: path.join(__dirname, 'dir'),
+    path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
+    publicPath: '/'
+  },
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    historyApiFallback: true,
+    host: 'localhost',
+    port: 8000,
+    proxy: {
+      '/gql': 'http://localhost:4000',
+    },
+    open: true,
   }
 };
 module.exports = config;
