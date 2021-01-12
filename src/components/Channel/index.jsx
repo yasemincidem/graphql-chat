@@ -1,31 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
-import ChannelLists from './List';
 import Navbar from '../Navbar';
-import { BrowserRouter as Router } from 'react-router-dom';
-import List from '@material-ui/core/List/List';
-import ListSubheader from '@material-ui/core/ListSubheader/ListSubheader';
-import ListItem from '@material-ui/core/ListItem/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon/ListItemIcon';
-import InboxIcon from '@material-ui/core/SvgIcon/SvgIcon';
-import ListItemText from '@material-ui/core/ListItemText/ListItemText';
-import Collapse from '@material-ui/core/Collapse/Collapse';
-import { ExpandLess, ExpandMore, StarBorder } from '@material-ui/icons';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Collapse,
+  Grid,
+  Card,
+  TextField,
+  FormControl,
+  withStyles,
+  Divider,
+  Avatar,
+  ListItemAvatar,
+  Typography,
+} from '@material-ui/core';
+import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import { useStyles } from './styles';
-import Grid from '@material-ui/core/Grid/Grid';
-import Paper from '@material-ui/core/Paper/Paper';
-import Card from '@material-ui/core/Card/Card';
-import TextField from '@material-ui/core/TextField/TextField';
-import InputLabel from '@material-ui/core/InputLabel/InputLabel';
-import Input from '@material-ui/core/Input/Input';
-import FormControl from '@material-ui/core/FormControl/FormControl';
-import InputAdornment from '@material-ui/core/InputAdornment/InputAdornment';
-import OutlinedInput from '@material-ui/core/OutlinedInput/OutlinedInput';
-import withStyles from '@material-ui/core/styles/withStyles';
-import Divider from '@material-ui/core/Divider/Divider';
-import Avatar from '@material-ui/core/Avatar/Avatar';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar/ListItemAvatar';
-import Typography from '@material-ui/core/Typography/Typography';
 
 const CHANNELS_QUERY = gql`
   query {
@@ -35,6 +27,13 @@ const CHANNELS_QUERY = gql`
     }
   }
 `;
+const mockMessages = [
+  { from: 0, message: 'ssss' },
+  { from: 1, message: 'asdsdadad' },
+  { from: 1, message: 'kljhsdlkhjglkgkklhg' },
+  { from: 0, message: 'lkhjsdklfhsdlkhdslkfh' },
+  { from: 1, message: 'ljdşfhjsşkdlfjşdsfşdsfljsdflş' },
+];
 const ValidationTextField = withStyles({
   root: {
     '& input:valid + fieldset': {
@@ -51,13 +50,6 @@ const ValidationTextField = withStyles({
     },
   },
 })(TextField);
-const mockMessages = [
-  { from: 0, message: 'ssss' },
-  { from: 1, message: 'asdsdadad' },
-  { from: 1, message: 'kljhsdlkhjglkgkklhg' },
-  { from: 0, message: 'lkhjsdklfhsdlkhdslkfh' },
-  { from: 1, message: 'ljdşfhjsşkdlfjşdsfşdsfljsdflş' },
-];
 const Channels = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
@@ -74,9 +66,9 @@ const Channels = () => {
   };
 
   const keyPress = (e) => {
-    if(e.keyCode == 13){
+    if (e.keyCode == 13) {
       messages.push();
-      setMessages([...messages, {from: 0, message: e.target.value}]);
+      setMessages([...messages, { from: 0, message: e.target.value }]);
       setMessage('');
     }
   };
