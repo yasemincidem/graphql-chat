@@ -3,12 +3,6 @@ import { makeStyles } from '@material-ui/core';
 
 export const StyledChannelListWrapper = styled.div``;
 export const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-    marginTop: theme.spacing(2),
-  },
   root: {
     width: '100%',
     maxWidth: 360,
@@ -16,5 +10,25 @@ export const useStyles = makeStyles((theme) => ({
   },
   nested: {
     paddingLeft: theme.spacing(4),
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+    height: '800px',
+    position: 'relative',
+    overflow: 'auto',
+    maxHeight: 800,
+  },
+  container: {
+    flexGrow: 1,
+  },
+  margin: theme.spacing(1),
+  buttonWrapper: { position: 'absolute', bottom: 20, width: '97%' },
+  iconButton: {
+    padding: 10,
+  },
+  messagesGroup: {
+    overflow: 'auto',
   },
 }));
