@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   TextField,
   Container,
@@ -7,7 +7,7 @@ import {
   Grid,
   Button,
   Avatar,
-  Link
+  Link,
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -31,15 +31,25 @@ const SIGN_UP = gql`
 const Register = () => {
   const classes = useSignupStyles();
   const [input, setInput] = useState({});
-  const [signup, {loading, error, data}] = useMutation(SIGN_UP);
+  const [isValid, setIsValid] = useState(false);
+  const [signup, { loading, error, data }] = useMutation(SIGN_UP);
   const history = useHistory();
-  if (error) {
-    throw new Error("Fetching error in signup mutation");
-  }
-  if (data) {
-    localStorage.setItem('token', data.signup.token);
-    history.push('/channels');
-  }
+  useEffect(() => {
+    if (input.name && input.surname && input.email && input.password) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  }, [input && Object.keys(input).length]);
+
+  useEffect(() => {
+    if (data && Object.keys(data).length) {
+      localStorage.setItem('token', data.signup.token);
+      history.push('/channels');
+    }
+  }, [data && Object.keys(data).length]);
+
+  // TODO: You need to change firstname and lastname with username
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -49,6 +59,9 @@ const Register = () => {
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign up
+        </Typography>
+        <Typography color="error" component="h8" variant="h8">
+          {error && error.message ? error.message : null}
         </Typography>
         <div className={classes.form} noValidate>
           <Grid container spacing={2}>
@@ -61,19 +74,18 @@ const Register = () => {
                 fullWidth
                 label="First Name"
                 autoFocus
-                onChange={(e) => setInput({...input, ...{name: e.target.value}})}
+                onChange={(e) => setInput({ ...input, ...{ name: e.target.value } })}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 variant="outlined"
-                required
                 fullWidth
                 id="lastName"
                 label="Last Name"
                 name="lastName"
                 autoComplete="lname"
-                onChange={(e) => setInput({...input, ...{surname: e.target.value}})}
+                onChange={(e) => setInput({ ...input, ...{ surname: e.target.value } })}
               />
             </Grid>
             <Grid item xs={12}>
@@ -85,7 +97,7 @@ const Register = () => {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                onChange={(e) => setInput({...input, ...{email: e.target.value}})}
+                onChange={(e) => setInput({ ...input, ...{ email: e.target.value } })}
               />
             </Grid>
             <Grid item xs={12}>
@@ -98,7 +110,7 @@ const Register = () => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                onChange={(e) => setInput({...input, ...{password: e.target.value}})}
+                onChange={(e) => setInput({ ...input, ...{ password: e.target.value } })}
               />
             </Grid>
           </Grid>
@@ -109,19 +121,20 @@ const Register = () => {
             color="primary"
             className={classes.submit}
             loading={loading}
-            onClick={(e) => {
+            disabled={!isValid}
+            onClick={() =>
               signup({
                 variables: {
                   input,
                 },
               })
-            }}
+            }
           >
             Sign Up
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link href="login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>

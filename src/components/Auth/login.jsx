@@ -31,17 +31,27 @@ const LOG_IN = gql`
 const Login = () => {
   const classes = useLoginStyles();
   const [input, setInput] = useState({});
+  const [isValid, setIsValid] = useState(false);
   const [login, { loading, error, data }] = useMutation(LOG_IN);
   const history = useHistory();
-  if (error) {
-    throw new Error('Fetching error in login mutation');
-  }
+
+  // If we have multiple instances of useEffect in the component,
+  // all the useEffect functions will be executed in the same order
+  // as they are defined inside the component.
   useEffect(() => {
-    if (data) {
+    if (input.email && input.password) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  }, [input && Object.keys(input).length]);
+
+  useEffect(() => {
+    if (data && Object.keys(data).length) {
       localStorage.setItem('token', data.login.token);
       history.push('/channels');
     }
-  }, [data]);
+  }, [data && Object.keys(data).length]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -52,6 +62,9 @@ const Login = () => {
         </Avatar>
         <Typography component="h1" variant="h5">
           Login
+        </Typography>
+        <Typography color="error" component="h8" variant="h8">
+          {error && error.message ? error.message : null}
         </Typography>
         <div className={classes.form} noValidate>
           <Grid container spacing={2}>
@@ -88,13 +101,14 @@ const Login = () => {
             color="primary"
             className={classes.submit}
             loading={loading}
-            onClick={(e) => {
+            disabled={!isValid}
+            onClick={() =>
               login({
                 variables: {
                   input,
                 },
-              });
-            }}
+              })
+            }
           >
             Sign in
           </Button>
