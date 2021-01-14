@@ -1,6 +1,4 @@
 const DataLoader = require('dataloader');
-const { keyBy } = require('lodash');
-const Channels = require('./channel/channel.model');
 const Users = require('./auth/user.model');
 const Posts = require('./post/post.model');
 
@@ -25,11 +23,14 @@ const batchChannelPosts = async (keys) => {
   } else {
     results = await Posts.find({ to: id }).limit(last).sort({ created_at: -1 });
   }
-  const edges = results.map((post) => {
+  const edges = results.map(async (post) => {
     const buffer = new Buffer(post.id);
     const cursor = buffer.toString('base64');
+    const from = await Users.findOne({ _id: post.from });
+    const to = await Users.findOne({ _id: post.to });
+    const newPost = { _id: post._id, text: post.text, created_at: post.created_at, from, to };
     return {
-      node: post,
+      node: newPost,
       cursor,
     };
   });

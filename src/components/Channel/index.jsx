@@ -31,8 +31,16 @@ const CHANNELS_QUERY = gql`
         }
         edges {
           node {
-            to
-            from
+            to {
+               _id
+               name
+               surname
+            }
+            from {
+               _id
+               name
+               surname
+            }
             text
             created_at
           }
@@ -79,8 +87,6 @@ const Channels = () => {
     setMessages(posts);
   };
 
-  console.log('messages', messages);
-
   return (
     <div className={classes.container}>
       <Navbar />
@@ -117,7 +123,7 @@ const Channels = () => {
                       <>
                         <ListItem alignItems="flex-start">
                           <div style={{ marginRight: 15 }}>
-                            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                            <Avatar src="/static/images/avatar/1.jpg" />
                           </div>
                           <ListItemText
                             secondary={message.text}
@@ -128,7 +134,7 @@ const Channels = () => {
                                 className={classes.inline}
                                 color="textPrimary"
                               >
-                                {message.from}
+                                {`${message.from.name} ${message.from.surname}`}
                               </Typography>
                             }
                           />
