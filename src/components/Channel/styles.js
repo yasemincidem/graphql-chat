@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, TextField, withStyles } from '@material-ui/core';
 
 export const StyledChannelListWrapper = styled.div``;
 export const useStyles = makeStyles((theme) => ({
@@ -32,3 +32,19 @@ export const useStyles = makeStyles((theme) => ({
     overflow: 'auto',
   },
 }));
+export const ValidationTextField = withStyles({
+  root: {
+    '& input:valid + fieldset': {
+      borderColor: 'green',
+      borderWidth: 2,
+    },
+    '& input:invalid + fieldset': {
+      borderColor: 'red',
+      borderWidth: 2,
+    },
+    '& input:valid:focus + fieldset': {
+      borderLeftWidth: 6,
+      padding: '4px !important', // override inline-style
+    },
+  },
+})(TextField);
