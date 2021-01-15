@@ -1,45 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import Navbar from '../Navbar';
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Collapse,
-  Grid,
-  Card,
-  TextField,
-  FormControl,
-  withStyles,
-  Divider,
-  Avatar,
-  ListItemAvatar,
-  Typography,
-} from '@material-ui/core';
+import { List, ListItem, ListItemText, Collapse, Grid, Card } from '@material-ui/core';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
-import { useStyles, ValidationTextField } from './styles';
+import { useStyles } from './styles';
+import Messages from './Messages';
 
 const CHANNELS_QUERY = gql`
-  query {
+  query channels($before: String) {
     channels {
       _id
       name
-      posts(last: 20) {
+      posts(last: 10, before: $before) {
         pageInfo {
           hasPreviousPage
           matchCount
         }
         edges {
+          cursor
           node {
             to {
-               _id
-               name
-               surname
+              _id
+              name
+              surname
             }
             from {
-               _id
-               name
-               surname
+              _id
+              name
+              surname
             }
             text
             created_at
@@ -54,27 +42,14 @@ const Channels = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState('');
   const [channelId, setChannel] = useState('');
 
-  const { loading, error, data } = useQuery(CHANNELS_QUERY);
+  const { loading, error, data, fetchMore } = useQuery(CHANNELS_QUERY);
   if (loading) return <div>Channels loading ...</div>;
   if (error) return <div>Error in fetching channels</div>;
 
   const handleClick = () => {
     setOpen(!open);
-  };
-
-  const handleChange = (event) => {
-    setMessage(event.target.value);
-  };
-
-  const keyPress = (e) => {
-    if (e.keyCode == 13) {
-      messages.push();
-      setMessages([...messages, { from: 0, message: e.target.value }]);
-      setMessage('');
-    }
   };
 
   const selectChannel = (channelId) => {
@@ -83,7 +58,8 @@ const Channels = () => {
       data && data.channels.length
         ? data.channels.find((channel) => channel._id === channelId)
         : {};
-    const posts = channel && Object.keys(channel).length ? channel.posts.edges.map(i => i.node) : [];
+    const posts =
+      channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
     setMessages(posts);
   };
 
@@ -116,47 +92,14 @@ const Channels = () => {
         </Grid>
         <Grid item xs={9}>
           <Card className={classes.paper}>
-            <div className={classes.buttonWrapper}>
-              <List className={classes.messagesGroup}>
-                {messages && messages.length
-                  ? messages.map((message) => (
-                      <>
-                        <ListItem alignItems="flex-start">
-                          <div style={{ marginRight: 15 }}>
-                            <Avatar src="/static/images/avatar/1.jpg" />
-                          </div>
-                          <ListItemText
-                            secondary={message.text}
-                            primary={
-                              <Typography
-                                component="span"
-                                variant="body2"
-                                className={classes.inline}
-                                color="textPrimary"
-                              >
-                                {`${message.from.name} ${message.from.surname}`}
-                              </Typography>
-                            }
-                          />
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                      </>
-                    ))
-                  : null}
-              </List>
-              <FormControl fullWidth className={classes.margin}>
-                <ValidationTextField
-                  className={classes.margin}
-                  label="Text Message"
-                  onKeyDown={keyPress}
-                  onChange={handleChange}
-                  required
-                  value={message}
-                  variant="outlined"
-                  id="validation-outlined-input"
-                />
-              </FormControl>
-            </div>
+            <Messages
+              classes={classes}
+              messages={messages}
+              setMessages={(messages) => setMessages(messages)}
+              fetchMore={fetchMore}
+              data={data}
+              channelId={channelId}
+            />
           </Card>
         </Grid>
       </Grid>

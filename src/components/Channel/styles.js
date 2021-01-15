@@ -30,6 +30,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   messagesGroup: {
     overflow: 'auto',
+    height: '700px'
   },
 }));
 export const ValidationTextField = withStyles({
