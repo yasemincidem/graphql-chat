@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Avatar,
   Divider,
@@ -11,32 +11,58 @@ import {
 import { ValidationTextField } from './styles';
 
 const Messages = (props) => {
-  const { classes, messages, fetchMore, setMessages, data, channelId } = props;
+  const { classes, fetchMore, data, channelId } = props;
   const loader = useRef(null);
+  const messageEl = useRef(null);
   const channel =
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
+  const messages =
+    channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
   const cursor = 'NWY3MzBiMzA2NGIxYzQzMmJmYmJkODFk';
   const pageInfo = channel && Object.keys(channel).length ? channel.posts.pageInfo : {};
   // here we handle what happens when user scrolls to Load More div
   // in this case we just update page variable
   const loadMore = useCallback((entries) => {
     const target = entries[0];
-    console.log('pageInfo', pageInfo);
-    console.log('target', target.intersectionRatio);
-    if (target.intersectionRatio === 0 && pageInfo.hasPreviousPage) {
-      console.log('s', cursor);
+    if (
+      target.intersectionRatio <1 &&
+      target.boundingClientRect.top > target.intersectionRect.top &&
+      pageInfo.hasPreviousPage
+    ) {
       fetchMore({
         variables: {
-          before: cursor
+          before: cursor,
         },
         updateQuery: (prev, { fetchMoreResult }) => {
-          console.log('prev', prev);
-          console.log('fetchMoreResult', fetchMoreResult);
-        }
+          const channels = prev.channels.map((i) => ({
+            name: i.name,
+            _id: i._id,
+            posts: {
+              pageInfo: fetchMoreResult.channels.find((t) => t._id === i._id).posts.pageInfo,
+              edges: [
+                ...i.posts.edges,
+                ...fetchMoreResult.channels.find((m) => m._id === i._id).posts.edges,
+              ],
+            },
+          }));
+          return { channels };
+        },
       });
     }
   });
+
   useEffect(() => {
+    console.log('mounted');
+    if (messageEl) {
+      messageEl.current.addEventListener('DOMNodeInserted', (event) => {
+        const { currentTarget: target } = event;
+        target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+      });
+    }
+  }, [messageEl]);
+
+  useEffect(() => {
+    console.log('scroll');
     const options = {
       root: null,
       rootMargin: '0px',
@@ -58,13 +84,12 @@ const Messages = (props) => {
   const keyPress = (e) => {
     if (e.keyCode == 13) {
       messages.push();
-      setMessages([...messages, { from: 0, message: e.target.value }]);
     }
   };
 
   return (
     <div className={classes.buttonWrapper}>
-      <List className={classes.messagesGroup}>
+      <List className={classes.messagesGroup} ref={messageEl}>
         {messages && messages.length
           ? messages.map((message) => (
               <>

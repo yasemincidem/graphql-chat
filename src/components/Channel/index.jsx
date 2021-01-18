@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import Navbar from '../Navbar';
 import { List, ListItem, ListItemText, Collapse, Grid, Card } from '@material-ui/core';
@@ -41,7 +41,6 @@ const CHANNELS_QUERY = gql`
 const Channels = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
-  const [messages, setMessages] = useState([]);
   const [channelId, setChannel] = useState('');
 
   const { loading, error, data, fetchMore } = useQuery(CHANNELS_QUERY);
@@ -54,13 +53,6 @@ const Channels = () => {
 
   const selectChannel = (channelId) => {
     setChannel(channelId);
-    const channel =
-      data && data.channels.length
-        ? data.channels.find((channel) => channel._id === channelId)
-        : {};
-    const posts =
-      channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
-    setMessages(posts);
   };
 
   return (
@@ -92,14 +84,7 @@ const Channels = () => {
         </Grid>
         <Grid item xs={9}>
           <Card className={classes.paper}>
-            <Messages
-              classes={classes}
-              messages={messages}
-              setMessages={(messages) => setMessages(messages)}
-              fetchMore={fetchMore}
-              data={data}
-              channelId={channelId}
-            />
+            <Messages classes={classes} fetchMore={fetchMore} data={data} channelId={channelId || data.channels[0]._id} />
           </Card>
         </Grid>
       </Grid>
