@@ -25,8 +25,8 @@ const Messages = (props) => {
   const loadMore = useCallback((entries) => {
     const target = entries[0];
     if (
-      target.intersectionRatio <1 &&
-      target.boundingClientRect.top > target.intersectionRect.top &&
+      Math.round(target.intersectionRatio * 100) / 100 > 0.01 &&
+      Math.round(target.intersectionRatio * 100) / 100 < 0.4 &&
       pageInfo.hasPreviousPage
     ) {
       fetchMore({
@@ -52,7 +52,6 @@ const Messages = (props) => {
   });
 
   useEffect(() => {
-    console.log('mounted');
     if (messageEl) {
       messageEl.current.addEventListener('DOMNodeInserted', (event) => {
         const { currentTarget: target } = event;
@@ -62,12 +61,15 @@ const Messages = (props) => {
   }, [messageEl]);
 
   useEffect(() => {
-    console.log('scroll');
     const options = {
       root: null,
       rootMargin: '0px',
       threshold: 0.25,
     };
+    messageEl.current.addEventListener('scroll', (event) => {
+      const { currentTarget: target } = event;
+      console.log('targe', target.scrollHeight);
+    });
     // initialize IntersectionObserver
     // and attaching to Load More div
     const observer = new IntersectionObserver(loadMore, options);
