@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMutation, gql } from '@apollo/client';
 import {
   Avatar,
   Divider,
@@ -9,11 +10,29 @@ import {
   Typography,
 } from '@material-ui/core';
 import { ValidationTextField } from './styles';
-
+import { CHANNELS_QUERY } from './index';
+const SEND_MESSAGE = gql`
+  mutation SendMessage($to: String!, $from: String!, $text: String!) {
+    sendMessage(input: { to: $to, from: $from, text: $text }) {
+      text
+      created_at
+      from {
+        name
+      }
+      to {
+        name
+      }
+    }
+  }
+`;
 const Messages = (props) => {
   const { classes, fetchMore, data, channelId } = props;
   const loader = useRef(null);
   const messageEl = useRef(null);
+  const [message, setMessage] = useState('');
+  const [sendMessage] = useMutation(SEND_MESSAGE, {
+    refetchQueries: [{ query: CHANNELS_QUERY }],
+  });
   const channel =
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
   const messages =
@@ -71,8 +90,8 @@ const Messages = (props) => {
     const observer = new IntersectionObserver(loadMore, options);
     if (loader && loader.current) {
       observer.observe(loader.current);
+      return () => observer.unobserve(loader.current);
     }
-    return () => observer.unobserve(loader.current);
   }, [loader, loadMore]);
 
   const handleChange = (event) => {
@@ -81,7 +100,13 @@ const Messages = (props) => {
 
   const keyPress = (e) => {
     if (e.keyCode == 13) {
-      messages.push();
+      sendMessage({
+        variables: {
+          from: '5f7244fa7b845a22eeeeade1',
+          to: '5f7245377b845a22eeeeade2',
+          text: message,
+        },
+      });
     }
   };
 

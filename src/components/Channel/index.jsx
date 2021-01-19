@@ -6,7 +6,7 @@ import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import { useStyles } from './styles';
 import Messages from './Messages';
 
-const CHANNELS_QUERY = gql`
+export const CHANNELS_QUERY = gql`
   query channels($before: String) {
     channels {
       _id
