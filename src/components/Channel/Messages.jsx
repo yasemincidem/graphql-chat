@@ -18,8 +18,8 @@ const Messages = (props) => {
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
   const messages =
     channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
-  const cursor = 'NWY3MzBiMzA2NGIxYzQzMmJmYmJkODFk';
   const pageInfo = channel && Object.keys(channel).length ? channel.posts.pageInfo : {};
+  const cursor = pageInfo.cursor;
   // here we handle what happens when user scrolls to Load More div
   // in this case we just update page variable
   const loadMore = useCallback((entries) => {
@@ -66,10 +66,6 @@ const Messages = (props) => {
       rootMargin: '0px',
       threshold: 0.25,
     };
-    messageEl.current.addEventListener('scroll', (event) => {
-      const { currentTarget: target } = event;
-      console.log('targe', target.scrollHeight);
-    });
     // initialize IntersectionObserver
     // and attaching to Load More div
     const observer = new IntersectionObserver(loadMore, options);
