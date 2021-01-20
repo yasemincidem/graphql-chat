@@ -89,32 +89,34 @@ const Messages = (props) => {
 
   return (
     <div className={classes.buttonWrapper}>
-      {loading && (<div>Loading</div>)}
+      {loading && <div>Loading</div>}
       <List className={classes.messagesGroup} ref={messageEl}>
         {messages && messages.length
-          ? messages.map((message, index) => (
-              <div key={index}>
-                <ListItem alignItems="flex-start">
-                  <div style={{ marginRight: 15 }}>
-                    <Avatar src="/static/images/avatar/1.jpg" />
-                  </div>
-                  <ListItemText
-                    secondary={message.text}
-                    primary={
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        className={classes.inline}
-                        color="textPrimary"
-                      >
-                        {`${message.from.name} ${message.from.surname}`}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-                <Divider variant="inset" component="li" />
-              </div>
-            ))
+          ? messages
+              .sort((a, b) => a.created_at - b.created_at)
+              .map((message, index) => (
+                <div key={index}>
+                  <ListItem alignItems="flex-start">
+                    <div style={{ marginRight: 15 }}>
+                      <Avatar src="/static/images/avatar/1.jpg" />
+                    </div>
+                    <ListItemText
+                      secondary={message.text}
+                      primary={
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          className={classes.inline}
+                          color="textPrimary"
+                        >
+                          {`${message.from.name} ${message.from.surname}`}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                </div>
+              ))
           : null}
       </List>
       <FormControl fullWidth className={classes.margin}>
