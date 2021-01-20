@@ -12,7 +12,6 @@ export const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(4),
   },
   paper: {
-    padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
     height: '800px',
@@ -30,7 +29,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   messagesGroup: {
     overflow: 'auto',
-    height: '700px'
+    height: '680px'
   },
 }));
 export const ValidationTextField = withStyles({

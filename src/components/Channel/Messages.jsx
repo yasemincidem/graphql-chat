@@ -26,29 +26,30 @@ const SEND_MESSAGE = gql`
   }
 `;
 const Messages = (props) => {
-  const { classes, fetchMore, data, channelId } = props;
-  const loader = useRef(null);
+  const { classes, fetchMore, data, channelId, loading } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
   const [sendMessage] = useMutation(SEND_MESSAGE, {
     refetchQueries: [{ query: CHANNELS_QUERY }],
   });
+
   const channel =
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
   const messages =
     channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
   const pageInfo = channel && Object.keys(channel).length ? channel.posts.pageInfo : {};
-  const cursor = pageInfo.cursor;
-  // here we handle what happens when user scrolls to Load More div
-  // in this case we just update page variable
-  const loadMore = useCallback((entries) => {
-    const target = entries[0];
-    if (
-      Math.round(target.intersectionRatio * 100) / 100 > 0.01 &&
-      Math.round(target.intersectionRatio * 100) / 100 < 0.4 &&
-      pageInfo.hasPreviousPage
-    ) {
-      fetchMore({
+
+  useEffect(() => {
+    messageEl.current.addEventListener('scroll', handleScroll);
+    return () => messageEl.current.removeEventListener('scroll', handleScroll);
+  });
+
+  const handleScroll = () => {
+    if (messageEl.current.scrollTop === 0 && pageInfo.hasPreviousPage) {
+      const cursors =
+        channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.cursor) : [];
+      const cursor = cursors && cursors.length ? cursors[cursors.length - 1] : '';
+      return fetchMore({
         variables: {
           before: cursor,
         },
@@ -68,31 +69,7 @@ const Messages = (props) => {
         },
       });
     }
-  });
-
-  useEffect(() => {
-    if (messageEl) {
-      messageEl.current.addEventListener('DOMNodeInserted', (event) => {
-        const { currentTarget: target } = event;
-        target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
-      });
-    }
-  }, [messageEl]);
-
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.25,
-    };
-    // initialize IntersectionObserver
-    // and attaching to Load More div
-    const observer = new IntersectionObserver(loadMore, options);
-    if (loader && loader.current) {
-      observer.observe(loader.current);
-      return () => observer.unobserve(loader.current);
-    }
-  }, [loader, loadMore]);
+  };
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -112,10 +89,11 @@ const Messages = (props) => {
 
   return (
     <div className={classes.buttonWrapper}>
+      {loading && (<div>Loading</div>)}
       <List className={classes.messagesGroup} ref={messageEl}>
         {messages && messages.length
-          ? messages.map((message) => (
-              <>
+          ? messages.map((message, index) => (
+              <div key={index}>
                 <ListItem alignItems="flex-start">
                   <div style={{ marginRight: 15 }}>
                     <Avatar src="/static/images/avatar/1.jpg" />
@@ -135,12 +113,9 @@ const Messages = (props) => {
                   />
                 </ListItem>
                 <Divider variant="inset" component="li" />
-              </>
+              </div>
             ))
           : null}
-        <div className="loading" ref={loader}>
-          <h2>Load More</h2>
-        </div>
       </List>
       <FormControl fullWidth className={classes.margin}>
         <ValidationTextField

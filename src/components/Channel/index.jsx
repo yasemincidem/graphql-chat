@@ -73,6 +73,7 @@ const Channels = () => {
                       button
                       onClick={() => selectChannel(channel._id)}
                       selected={channelId === channel._id}
+                      key={channel._id}
                     >
                       <ListItemText primary={channel.name} />
                     </ListItem>
@@ -84,7 +85,13 @@ const Channels = () => {
         </Grid>
         <Grid item xs={9}>
           <Card className={classes.paper}>
-            <Messages classes={classes} fetchMore={fetchMore} data={data} channelId={channelId || data.channels[0]._id} />
+            <Messages
+              classes={classes}
+              fetchMore={fetchMore}
+              data={data}
+              loading={loading}
+              channelId={channelId || data.channels[0]._id}
+            />
           </Card>
         </Grid>
       </Grid>
