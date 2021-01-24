@@ -14,10 +14,10 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     textAlign: 'center',
     color: theme.palette.text.secondary,
-    height: '800px',
+    height: '850px',
     position: 'relative',
     overflow: 'auto',
-    maxHeight: 800,
+    maxHeight: 850,
   },
   container: {
     flexGrow: 1,

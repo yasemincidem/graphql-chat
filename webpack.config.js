@@ -30,7 +30,8 @@ const config = {
     ],
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx'],
+    mainFields: ['browser', 'main', 'module'],
+    extensions: ['.js', '.json', '.jsx']
   },
   plugins: [
     new WebpackBar({ name: '​client' }),

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation, gql, useSubscription } from '@apollo/client';
 import {
   Avatar,
   Divider,
@@ -25,13 +25,30 @@ const SEND_MESSAGE = gql`
     }
   }
 `;
+const MESSAGES_SUBSCRIPTION = gql`
+  subscription {
+    newMessage {
+      text
+      to {
+        name
+      }
+      from {
+        name
+      }
+      created_at
+    }
+  }
+`;
 const Messages = (props) => {
   const { classes, fetchMore, data, channelId, loading } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
-  const [sendMessage] = useMutation(SEND_MESSAGE, {
-    refetchQueries: [{ query: CHANNELS_QUERY }],
-  });
+
+  const { data: messageAdded, loading: loadingSubscription, error } = useSubscription(
+    MESSAGES_SUBSCRIPTION
+  );
+  console.log('newMessage', messageAdded);
+  const [sendMessage] = useMutation(SEND_MESSAGE);
 
   const channel =
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
