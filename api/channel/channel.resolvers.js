@@ -1,4 +1,4 @@
-const authResolvers = require('../auth/auth.resolvers');
+const ObjectId = require('mongodb').ObjectId;
 
 const createChannel = async (_, { input }, ctx) => {
   const { name, description, email } = input;
@@ -36,8 +36,9 @@ const addPeopleToChannel = async (_, { input }, ctx) => {
   );
   return channel;
 };
-const channels = async (_, {}, ctx) => {
-  const channels = await ctx.models.channel.find({});
+const channels = async (_, {userId}, ctx) => {
+  console.log('userId', userId);
+  const channels = await ctx.models.channel.find({'users._id': ObjectId(userId)});
   return channels;
 };
 const channel = async (_, { id }, ctx) => {

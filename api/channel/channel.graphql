@@ -32,6 +32,6 @@ extend type Mutation {
     addPeopleToChannel(input: ChannelUserInput!): Channel!
 }
 extend type Query {
-    channels: [Channel]
+    channels(userId: String!): [Channel]
     channel(id: String!): Channel
 }

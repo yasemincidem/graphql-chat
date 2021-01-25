@@ -7,8 +7,8 @@ import { useStyles } from './styles';
 import Messages from './Messages';
 
 export const CHANNELS_QUERY = gql`
-  query channels($before: String) {
-    channels {
+  query channels($userId: String!, $before: String) {
+    channels(userId: $userId) {
       _id
       name
       posts(last: 10, before: $before) {
@@ -19,16 +19,8 @@ export const CHANNELS_QUERY = gql`
         edges {
           cursor
           node {
-            to {
-              _id
-              name
-              surname
-            }
-            from {
-              _id
-              name
-              surname
-            }
+            to
+            from
             text
             created_at
           }
@@ -38,12 +30,15 @@ export const CHANNELS_QUERY = gql`
   }
 `;
 
-const Channels = () => {
+const Channels = (props) => {
+  const user = props.location?.state?.params || {};
   const classes = useStyles();
   const [open, setOpen] = useState(true);
   const [channelId, setChannel] = useState('');
 
-  const { loading, error, data, fetchMore } = useQuery(CHANNELS_QUERY);
+  const { loading, error, data, fetchMore } = useQuery(CHANNELS_QUERY, {
+    variables: { userId: user._id },
+  });
   if (loading) return <div>Channels loading ...</div>;
   if (error) return <div>Error in fetching channels</div>;
 
@@ -86,11 +81,12 @@ const Channels = () => {
         <Grid item xs={9}>
           <Card className={classes.paper}>
             <Messages
+              user={props.location?.state?.params || ''}
               classes={classes}
               fetchMore={fetchMore}
               data={data}
               loading={loading}
-              channelId={channelId || data.channels[0]._id}
+              channelId={channelId}
             />
           </Card>
         </Grid>

@@ -1,8 +1,8 @@
 type Post {
     text: String!
     created_at: String!
-    from: User!
-    to: User
+    from: String!
+    to: String!
 }
 input PostInput {
     to: String!

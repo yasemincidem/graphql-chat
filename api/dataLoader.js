@@ -26,9 +26,7 @@ const batchChannelPosts = async (keys) => {
   const edges = results.map(async (post) => {
     const buffer = new Buffer(post.id);
     const cursor = buffer.toString('base64');
-    const from = await Users.findOne({ _id: post.from });
-    const to = await Users.findOne({ _id: post.to });
-    const newPost = { _id: post._id, text: post.text, created_at: post.created_at, from, to };
+    const newPost = { _id: post._id, text: post.text, created_at: post.created_at, from: post.from, to: post.to };
     return {
       node: newPost,
       cursor,

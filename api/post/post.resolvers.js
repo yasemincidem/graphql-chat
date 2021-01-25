@@ -6,11 +6,11 @@ const sendMessage = async (_, { input }, ctx) => {
       text,
       from,
       created_at: new Date().getTime(),
-      to,
+      to: to || null,
     });
   }
   newMessage = await ctx.models.post.insertMany({
-    to,
+    to: to || null,
     text,
     from,
     created_at: new Date().getTime(),

@@ -49,7 +49,7 @@ const Login = () => {
   useEffect(() => {
     if (data && Object.keys(data).length) {
       localStorage.setItem('token', data.login.token);
-      history.push('/channels');
+      history.push('/channels', {params: data.login.user});
     }
   }, [data && Object.keys(data).length]);
 

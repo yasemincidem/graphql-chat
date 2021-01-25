@@ -10,18 +10,14 @@ import {
   Typography,
 } from '@material-ui/core';
 import { ValidationTextField } from './styles';
-import { CHANNELS_QUERY } from './index';
+
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
     sendMessage(input: { to: $to, from: $from, text: $text }) {
       text
       created_at
-      from {
-        name
-      }
-      to {
-        name
-      }
+      from
+      to
     }
   }
 `;
@@ -29,32 +25,32 @@ const MESSAGES_SUBSCRIPTION = gql`
   subscription {
     newMessage {
       text
-      to {
-        name
-      }
-      from {
-        name
-      }
+      to
+      from
       created_at
     }
   }
 `;
 const Messages = (props) => {
-  const { classes, fetchMore, data, channelId, loading } = props;
+  const { classes, fetchMore, data, channelId, loading, user } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
 
   const { data: messageAdded, loading: loadingSubscription, error } = useSubscription(
-    MESSAGES_SUBSCRIPTION
+    MESSAGES_SUBSCRIPTION,
   );
-  console.log('newMessage', messageAdded);
   const [sendMessage] = useMutation(SEND_MESSAGE);
 
   const channel =
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
-  const messages =
+  const initMessages =
     channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
   const pageInfo = channel && Object.keys(channel).length ? channel.posts.pageInfo : {};
+
+  useEffect(() => {
+    setMessages(initMessages);
+  }, [JSON.stringify(messages) !== JSON.stringify(initMessages)]);
 
   useEffect(() => {
     messageEl.current.addEventListener('scroll', handleScroll);
@@ -96,20 +92,26 @@ const Messages = (props) => {
     if (e.keyCode == 13) {
       sendMessage({
         variables: {
-          from: '5f7244fa7b845a22eeeeade1',
-          to: '5f7245377b845a22eeeeade2',
+          from: user._id,
+          to: channelId,
           text: message,
         },
       });
     }
   };
-
+  let allMessages = messages;
+  if (
+    messageAdded &&
+    messageAdded.newMessage &&
+    channelId === messageAdded.newMessage.to) {
+    allMessages = [...allMessages, messageAdded.newMessage];
+  }
   return (
     <div className={classes.buttonWrapper}>
       {loading && <div>Loading</div>}
       <List className={classes.messagesGroup} ref={messageEl}>
-        {messages && messages.length
-          ? messages
+        {allMessages && allMessages.length
+          ? allMessages
               .sort((a, b) => a.created_at - b.created_at)
               .map((message, index) => (
                 <div key={index}>
@@ -126,7 +128,7 @@ const Messages = (props) => {
                           className={classes.inline}
                           color="textPrimary"
                         >
-                          {`${message.from.name} ${message.from.surname}`}
+                          {`${user.name} ${user.surname}`}
                         </Typography>
                       }
                     />
