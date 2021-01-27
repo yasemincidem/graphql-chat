@@ -1,15 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMutation, gql, useSubscription } from '@apollo/client';
-import {
-  Avatar,
-  Divider,
-  FormControl,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from '@material-ui/core';
+import { FormControl, List } from '@material-ui/core';
 import { ValidationTextField } from './styles';
+import Message from './Message';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
@@ -33,6 +26,7 @@ const MESSAGES_SUBSCRIPTION = gql`
 `;
 const Messages = (props) => {
   const { classes, fetchMore, data, channelId, loading, user } = props;
+  console.log('channelId', channelId);
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
@@ -50,7 +44,19 @@ const Messages = (props) => {
 
   useEffect(() => {
     setMessages(initMessages);
-  }, [JSON.stringify(messages) !== JSON.stringify(initMessages)]);
+  }, [initMessages && initMessages.length]);
+
+  useEffect(() => {
+    console.log('messageAdded', messageAdded);
+    if (messageAdded && messageAdded.newMessage && messageAdded.newMessage.to) {
+      const channel1 =
+        data && data.channels.length ? data.channels.find((channel) => channel._id === messageAdded.newMessage.to) : {};
+      const initMessages1 =
+        channel1 && Object.keys(channel1).length ? channel1.posts.edges.map((i) => i.node) : [];
+      const allMessages = [...initMessages1, messageAdded.newMessage];
+      setMessages(allMessages);
+    }
+  }, [messageAdded]);
 
   useEffect(() => {
     messageEl.current.addEventListener('scroll', handleScroll);
@@ -99,42 +105,15 @@ const Messages = (props) => {
       });
     }
   };
-  let allMessages = messages;
-  if (
-    messageAdded &&
-    messageAdded.newMessage &&
-    channelId === messageAdded.newMessage.to) {
-    allMessages = [...allMessages, messageAdded.newMessage];
-  }
   return (
     <div className={classes.buttonWrapper}>
       {loading && <div>Loading</div>}
       <List className={classes.messagesGroup} ref={messageEl}>
-        {allMessages && allMessages.length
-          ? allMessages
+        {messages && messages.length
+          ? messages
               .sort((a, b) => a.created_at - b.created_at)
               .map((message, index) => (
-                <div key={index}>
-                  <ListItem alignItems="flex-start">
-                    <div style={{ marginRight: 15 }}>
-                      <Avatar src="/static/images/avatar/1.jpg" />
-                    </div>
-                    <ListItemText
-                      secondary={message.text}
-                      primary={
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          className={classes.inline}
-                          color="textPrimary"
-                        >
-                          {`${user.name} ${user.surname}`}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                  <Divider variant="inset" component="li" />
-                </div>
+                <Message index={index} message={message} classes={classes} />
               ))
           : null}
       </List>
