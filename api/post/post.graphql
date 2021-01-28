@@ -12,6 +12,10 @@ input PostInput {
 extend type Mutation {
     sendMessage(input: PostInput!): [Post!]
 }
+type ChannelPostsSubscriptionEdge {
+  node: Post!
+  cursor: String!
+}
 type Subscription {
-    newMessage: Post!,
+    newMessage: ChannelPostsSubscriptionEdge!
 }

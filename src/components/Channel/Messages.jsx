@@ -17,46 +17,50 @@ const SEND_MESSAGE = gql`
 const MESSAGES_SUBSCRIPTION = gql`
   subscription {
     newMessage {
-      text
-      to
-      from
-      created_at
+      node {
+        text
+        to
+        from
+        created_at
+      }
+      cursor
     }
   }
 `;
 const Messages = (props) => {
-  const { classes, fetchMore, data, channelId, loading, user } = props;
-  console.log('channelId', channelId);
+  const { classes, fetchMore, subscribeToMore, data, channelId, loading, user } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-
-  const { data: messageAdded, loading: loadingSubscription, error } = useSubscription(
-    MESSAGES_SUBSCRIPTION,
-  );
   const [sendMessage] = useMutation(SEND_MESSAGE);
+
+  useEffect(() => {
+    subscribeToMore({
+      document: MESSAGES_SUBSCRIPTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        const channels = prev.channels.map((i) => {
+          if (i._id === subscriptionData.data.newMessage.node.to) {
+            return {
+              name: i.name,
+              _id: i._id,
+              posts: {
+                pageInfo: prev.channels.find((t) => t._id === i._id).posts.pageInfo,
+                edges: [...i.posts.edges, subscriptionData.data.newMessage],
+              },
+            };
+          } else {
+            return i;
+          }
+        });
+        return { channels };
+      },
+    });
+  }, []);
 
   const channel =
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
-  const initMessages =
+  const messages =
     channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
   const pageInfo = channel && Object.keys(channel).length ? channel.posts.pageInfo : {};
-
-  useEffect(() => {
-    setMessages(initMessages);
-  }, [initMessages && initMessages.length]);
-
-  useEffect(() => {
-    console.log('messageAdded', messageAdded);
-    if (messageAdded && messageAdded.newMessage && messageAdded.newMessage.to) {
-      const channel1 =
-        data && data.channels.length ? data.channels.find((channel) => channel._id === messageAdded.newMessage.to) : {};
-      const initMessages1 =
-        channel1 && Object.keys(channel1).length ? channel1.posts.edges.map((i) => i.node) : [];
-      const allMessages = [...initMessages1, messageAdded.newMessage];
-      setMessages(allMessages);
-    }
-  }, [messageAdded]);
 
   useEffect(() => {
     messageEl.current.addEventListener('scroll', handleScroll);

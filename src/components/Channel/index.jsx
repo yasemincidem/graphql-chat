@@ -36,7 +36,7 @@ const Channels = (props) => {
   const [open, setOpen] = useState(true);
   const [channelId, setChannel] = useState('');
 
-  const { loading, error, data, fetchMore } = useQuery(CHANNELS_QUERY, {
+  const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
   if (loading) return <div>Channels loading ...</div>;
@@ -84,6 +84,7 @@ const Channels = (props) => {
               user={props.location?.state?.params || ''}
               classes={classes}
               fetchMore={fetchMore}
+              subscribeToMore={subscribeToMore}
               data={data}
               loading={loading}
               channelId={channelId}

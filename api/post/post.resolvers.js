@@ -15,7 +15,9 @@ const sendMessage = async (_, { input }, ctx) => {
     from,
     created_at: new Date().getTime(),
   });
-  ctx.pubsub.publish('SEND_MESSAGE_TRIGGER', { newMessage: newMessage[0] });
+  const channelPost = await ctx.loader.loaderChannelPosts().load({ id: to });
+  const newPost = await channelPost.edges[0];
+  ctx.pubsub.publish('SEND_MESSAGE_TRIGGER', { newMessage: newPost });
   return newMessage;
 };
 module.exports = {
