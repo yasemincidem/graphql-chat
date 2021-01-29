@@ -3,6 +3,7 @@ import { useMutation, gql, useSubscription } from '@apollo/client';
 import { FormControl, List } from '@material-ui/core';
 import { ValidationTextField } from './styles';
 import Message from './Message';
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
@@ -31,6 +32,7 @@ const Messages = (props) => {
   const { classes, fetchMore, subscribeToMore, data, channelId, loading, user } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
+  const [loadingMessages, setLoadingMessages] = useState('false');
   const [sendMessage] = useMutation(SEND_MESSAGE);
 
   useEffect(() => {
@@ -67,11 +69,25 @@ const Messages = (props) => {
     return () => messageEl.current.removeEventListener('scroll', handleScroll);
   });
 
+  useEffect(() => {
+    if (messageEl) {
+      messageEl.current.addEventListener('DOMNodeInserted', scrollToTheBottom);
+    }
+    return () => messageEl.current.removeEventListener('DOMNodeInserted', scrollToTheBottom);
+  }, [messageEl]);
+
+  const scrollToTheBottom = (event) => {
+    const { currentTarget: target } = event;
+    console.log('targe', target);
+    target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+  };
+
   const handleScroll = () => {
     if (messageEl.current.scrollTop === 0 && pageInfo.hasPreviousPage) {
       const cursors =
         channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.cursor) : [];
       const cursor = cursors && cursors.length ? cursors[cursors.length - 1] : '';
+      setLoadingMessages(true);
       return fetchMore({
         variables: {
           before: cursor,
@@ -88,6 +104,7 @@ const Messages = (props) => {
               ],
             },
           }));
+          setLoadingMessages(false);
           return { channels };
         },
       });
@@ -107,11 +124,12 @@ const Messages = (props) => {
           text: message,
         },
       });
+      setMessage('');
     }
   };
   return (
     <div className={classes.buttonWrapper}>
-      {loading && <div>Loading</div>}
+      {loadingMessages === true ? <CircularProgress color="secondary" /> : null}
       <List className={classes.messagesGroup} ref={messageEl}>
         {messages && messages.length
           ? messages
@@ -128,6 +146,7 @@ const Messages = (props) => {
           onKeyDown={keyPress}
           onChange={handleChange}
           required
+          value={message}
           variant="outlined"
           id="validation-outlined-input"
         />
