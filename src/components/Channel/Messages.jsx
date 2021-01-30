@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useMutation, gql, useSubscription } from '@apollo/client';
+import { useMutation, gql } from '@apollo/client';
 import { FormControl, List } from '@material-ui/core';
 import { ValidationTextField } from './styles';
 import Message from './Message';
@@ -28,10 +28,12 @@ const MESSAGES_SUBSCRIPTION = gql`
     }
   }
 `;
+
 const Messages = (props) => {
   const { classes, fetchMore, subscribeToMore, data, channelId, loading, user } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
+  const [messageSuccess, setMessageSuccess] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState('false');
   const [sendMessage] = useMutation(SEND_MESSAGE);
 
@@ -74,12 +76,14 @@ const Messages = (props) => {
       messageEl.current.addEventListener('DOMNodeInserted', scrollToTheBottom);
     }
     return () => messageEl.current.removeEventListener('DOMNodeInserted', scrollToTheBottom);
-  }, [messageEl]);
+  });
 
   const scrollToTheBottom = (event) => {
     const { currentTarget: target } = event;
-    console.log('targe', target);
-    target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+    if (messageSuccess) {
+      target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+      setMessageSuccess(false);
+    }
   };
 
   const handleScroll = () => {
@@ -124,6 +128,7 @@ const Messages = (props) => {
           text: message,
         },
       });
+      setMessageSuccess(true);
       setMessage('');
     }
   };
