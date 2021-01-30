@@ -19,6 +19,13 @@ export const useStyles = makeStyles((theme) => ({
     overflow: 'auto',
     maxHeight: 850,
   },
+  paperModal: {
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    width: '30%',
+    height: '30%'
+  },
   container: {
     flexGrow: 1,
   },
@@ -29,7 +36,25 @@ export const useStyles = makeStyles((theme) => ({
   },
   messagesGroup: {
     overflow: 'auto',
-    height: '680px'
+    height: '680px',
+  },
+  list: {
+    paddingLeft: '10%',
+  },
+  clickableIcons: {
+    width: '15%',
+  },
+  channelIcon: {
+    paddingRight: 10,
+  },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  createBtnGroup: {
+    float: 'right',
+    marginTop: '10%',
   },
 }));
 export const ValidationTextField = withStyles({
