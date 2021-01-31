@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, gql, useMutation } from '@apollo/client';
 import Navbar from '../Navbar';
 import { List, ListItem, ListItemText, Collapse, Grid, Card } from '@material-ui/core';
 import { ExpandLess, ExpandMore, Add, BlurOnSharp } from '@material-ui/icons';
@@ -11,17 +11,6 @@ import Fade from '@material-ui/core/Fade';
 import TextField from '@material-ui/core/TextField/TextField';
 import FormControl from '@material-ui/core/FormControl/FormControl';
 import Button from '@material-ui/core/Button/Button';
-
-const getModalStyle = () => {
-  const top = 50 + Math.round(Math.random() * 20) - 10;
-  const left = 50 + Math.round(Math.random() * 20) - 10;
-
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`,
-  };
-};
 
 export const CHANNELS_QUERY = gql`
   query channels($userId: String!, $before: String) {
@@ -46,15 +35,25 @@ export const CHANNELS_QUERY = gql`
     }
   }
 `;
-
+const CREATE_CHANNEL = gql`
+  mutation CreateChannel($name: String!, $description: String, $email: String!) {
+    createChannel(input: { name: $name, description: $description, email: $email }) {
+      _id
+      name
+      description
+    }
+  }
+`;
 const Channels = (props) => {
   const user = props.location?.state?.params || {};
   const classes = useStyles();
   const [open, setOpen] = useState(true);
   const [channelId, setChannel] = useState('');
   const [openModal, toggleModal] = useState(false);
-  const modalStyle = getModalStyle();
+  const [channelName, setChannelName] = useState('');
+  const [descriptionName, setDescriptionName] = useState('');
 
+  const [createChannel] = useMutation(CREATE_CHANNEL);
   const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
@@ -67,6 +66,12 @@ const Channels = (props) => {
 
   const selectChannel = (channelId) => {
     setChannel(channelId);
+  };
+
+  const createNewChannel = () => {
+    createChannel({
+      variables: { name: channelName, description: descriptionName, email: user.email },
+    });
   };
 
   return (
@@ -142,21 +147,23 @@ const Channels = (props) => {
                 label="Name"
                 variant="outlined"
                 color="secondary"
+                onChange={(event) => setChannelName(event.target.value)}
               />
             </FormControl>
-            <div style={{marginTop: '5%'}}>
+            <div style={{ marginTop: '5%' }}>
               <FormControl fullWidth>
                 <TextField
                   id="channel-description"
                   label="Description (Optional)"
                   variant="outlined"
                   color="secondary"
+                  onChange={(event) => setDescriptionName(event.target.value)}
                 />
               </FormControl>
             </div>
-            <div className={classes.createBtnGroup}>
+            <div className={classes.createBtnGroup} onClick={() => createNewChannel()}>
               <Button variant="contained" color="primary">
-                Primary
+                Create
               </Button>
             </div>
           </div>
