@@ -110,7 +110,7 @@ const Navbar = () => {
   );
   return (
     <div className={classes.grow}>
-      <AppBar position="static">
+      <AppBar position="static" style={{backgroundColor: '#560027'}}>
         <Toolbar>
           <IconButton
             edge="start"

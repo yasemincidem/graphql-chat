@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMutation, gql } from '@apollo/client';
-import { FormControl, List } from '@material-ui/core';
+import { FormControl, List, CircularProgress, Divider, Typography, Box } from '@material-ui/core';
 import { ValidationTextField } from './styles';
 import Message from './Message';
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
@@ -55,6 +54,7 @@ const Messages = (props) => {
             return i;
           }
         });
+        console.log('chann', channels);
         return { channels };
       },
     });
@@ -134,16 +134,32 @@ const Messages = (props) => {
   };
   return (
     <div className={classes.buttonWrapper}>
-      {loadingMessages === true ? <CircularProgress color="secondary" /> : null}
-      <List className={classes.messagesGroup} ref={messageEl}>
-        {messages && messages.length
-          ? messages
-              .sort((a, b) => a.created_at - b.created_at)
-              .map((message, index) => (
-                <Message index={index} message={message} classes={classes} />
-              ))
-          : null}
-      </List>
+      <div className={classes.messagesGroup} ref={messageEl}>
+        {loadingMessages === true ? <CircularProgress color="secondary" /> : null}
+        <Typography component="div">
+          <Box
+            fontWeight="fontWeightBold"
+            fontSize="h6.fontSize"
+            color="black"
+            style={{ paddingLeft: 16 }}
+          >
+            {channel?.name ? `# ${channel.name}` : ''}
+          </Box>
+          <Box fontSize="normal" color="black" style={{ paddingLeft: 16 }}>
+            {channel?.description || ''}
+          </Box>
+        </Typography>
+        <Divider />
+        <List>
+          {messages && messages.length
+            ? messages
+            .sort((a, b) => a.created_at - b.created_at)
+            .map((message, index) => (
+              <Message index={index} message={message} classes={classes} />
+            ))
+            : null}
+        </List>
+      </div>
       <FormControl fullWidth className={classes.margin}>
         <ValidationTextField
           className={classes.margin}

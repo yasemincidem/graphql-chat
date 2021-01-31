@@ -6,18 +6,16 @@ export const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
   },
   nested: {
     paddingLeft: theme.spacing(4),
   },
   paper: {
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-    height: '850px',
+    color: '#ffffff',
+    height: '874px',
     position: 'relative',
     overflow: 'auto',
-    maxHeight: 850,
+    maxHeight: 874,
   },
   paperModal: {
     backgroundColor: theme.palette.background.paper,
@@ -27,6 +25,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   container: {
     flexGrow: 1,
+    margin: -8
   },
   margin: theme.spacing(1),
   buttonWrapper: { position: 'absolute', bottom: 20, width: '97%' },
@@ -35,7 +34,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   messagesGroup: {
     overflow: 'auto',
-    height: '680px',
+    height: '750px',
   },
   list: {
     paddingLeft: '10%',
@@ -55,6 +54,9 @@ export const useStyles = makeStyles((theme) => ({
     float: 'right',
     marginTop: '10%',
   },
+  boldChannel: {
+    fontWeight: 600
+  }
 }));
 export const ValidationTextField = withStyles({
   root: {

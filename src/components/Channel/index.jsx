@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
 import { useQuery, gql, useMutation } from '@apollo/client';
-import Navbar from '../Navbar';
-import { List, ListItem, ListItemText, Collapse, Grid, Card } from '@material-ui/core';
-import { ExpandLess, ExpandMore, Add, BlurOnSharp } from '@material-ui/icons';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Collapse,
+  Grid,
+  Card,
+  TextField,
+  FormControl,
+  Button,
+  Dialog,
+} from '@material-ui/core';
+import { ExpandLess, ExpandMore, Add } from '@material-ui/icons';
 import { useStyles } from './styles';
 import Messages from './Messages';
-import Modal from '@material-ui/core/Modal/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Fade from '@material-ui/core/Fade';
-import TextField from '@material-ui/core/TextField/TextField';
-import FormControl from '@material-ui/core/FormControl/FormControl';
-import Button from '@material-ui/core/Button/Button';
+import Navbar from '../Navbar';
 
 export const CHANNELS_QUERY = gql`
   query channels($userId: String!, $before: String) {
     channels(userId: $userId) {
       _id
       name
-      posts(last: 10, before: $before) {
+      description
+      posts(last: 25, before: $before) {
         pageInfo {
           hasPreviousPage
           matchCount
@@ -53,7 +59,10 @@ const Channels = (props) => {
   const [channelName, setChannelName] = useState('');
   const [descriptionName, setDescriptionName] = useState('');
 
-  const [createChannel] = useMutation(CREATE_CHANNEL);
+  const [createChannel, { data: dataCreatedChannel }] = useMutation(CREATE_CHANNEL, {
+    refetchQueries: [{ query: CHANNELS_QUERY, variables: { userId: user._id } }],
+  });
+
   const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
@@ -78,8 +87,8 @@ const Channels = (props) => {
     <div className={classes.container}>
       <Navbar />
       <Grid container>
-        <Grid item xs={3}>
-          <Card className={classes.paper}>
+        <Grid item xs={2}>
+          <Card className={classes.paper} style={{ backgroundColor: '#880e4f' }}>
             <List component="nav" aria-labelledby="nested-list-subheader" className={classes.root}>
               <ListItem>
                 <ListItem button onClick={handleClick} className={classes.clickableIcons}>
@@ -103,8 +112,7 @@ const Channels = (props) => {
                       selected={channelId === channel._id}
                       key={channel._id}
                     >
-                      <BlurOnSharp className={classes.channelIcon} />
-                      <ListItemText primary={channel.name} />
+                      <ListItemText primary={`#\t${channel.name}`} />
                     </ListItem>
                   ))}
                 </List>
@@ -112,7 +120,7 @@ const Channels = (props) => {
             </List>
           </Card>
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={10}>
           <Card className={classes.paper}>
             <Messages
               user={props.location?.state?.params || ''}
@@ -126,49 +134,40 @@ const Channels = (props) => {
           </Card>
         </Grid>
       </Grid>
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
+      <Dialog
         className={classes.modal}
-        open={openModal}
+        open={openModal && !(dataCreatedChannel && Object.keys(dataCreatedChannel).length)}
         onClose={() => toggleModal(false)}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
       >
-        <Fade in={openModal}>
-          <div className={classes.paperModal}>
-            <h2 id="transition-modal-title">Create Channel</h2>
+        <div className={classes.paperModal}>
+          <h2 id="transition-modal-title">Create Channel</h2>
+          <FormControl fullWidth>
+            <TextField
+              id="channel-name"
+              label="Name"
+              variant="outlined"
+              color="secondary"
+              onChange={(event) => setChannelName(event.target.value)}
+            />
+          </FormControl>
+          <div style={{ marginTop: '5%' }}>
             <FormControl fullWidth>
               <TextField
-                id="channel-name"
-                label="Name"
+                id="channel-description"
+                label="Description (Optional)"
                 variant="outlined"
                 color="secondary"
-                onChange={(event) => setChannelName(event.target.value)}
+                onChange={(event) => setDescriptionName(event.target.value)}
               />
             </FormControl>
-            <div style={{ marginTop: '5%' }}>
-              <FormControl fullWidth>
-                <TextField
-                  id="channel-description"
-                  label="Description (Optional)"
-                  variant="outlined"
-                  color="secondary"
-                  onChange={(event) => setDescriptionName(event.target.value)}
-                />
-              </FormControl>
-            </div>
-            <div className={classes.createBtnGroup} onClick={() => createNewChannel()}>
-              <Button variant="contained" color="primary">
-                Create
-              </Button>
-            </div>
           </div>
-        </Fade>
-      </Modal>
+          <div className={classes.createBtnGroup} onClick={() => createNewChannel()}>
+            <Button variant="contained" color="default">
+              Create
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 };
