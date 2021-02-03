@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyledChannelListWrapper } from './styles';
 const ChannelList = () => {
   const mock_channels = [
     {

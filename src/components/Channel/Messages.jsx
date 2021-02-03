@@ -29,7 +29,7 @@ const MESSAGES_SUBSCRIPTION = gql`
 `;
 
 const Messages = (props) => {
-  const { classes, fetchMore, subscribeToMore, data, channelId, loading, user } = props;
+  const { classes, fetchMore, subscribeToMore, data, channelId, user } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
   const [messageSuccess, setMessageSuccess] = useState(false);
@@ -44,6 +44,7 @@ const Messages = (props) => {
           if (i._id === subscriptionData.data.newMessage.node.to) {
             return {
               name: i.name,
+              description: i.description,
               _id: i._id,
               posts: {
                 pageInfo: prev.channels.find((t) => t._id === i._id).posts.pageInfo,
@@ -54,7 +55,6 @@ const Messages = (props) => {
             return i;
           }
         });
-        console.log('chann', channels);
         return { channels };
       },
     });
@@ -99,9 +99,16 @@ const Messages = (props) => {
         updateQuery: (prev, { fetchMoreResult }) => {
           const channels = prev.channels.map((i) => ({
             name: i.name,
+            description: i.description,
             _id: i._id,
             posts: {
-              pageInfo: fetchMoreResult.channels.find((t) => t._id === i._id).posts.pageInfo,
+              pageInfo: {
+                hasPreviousPage: fetchMoreResult.channels.find((t) => t._id === i._id).posts
+                  .pageInfo.hasPreviousPage,
+                matchCount:
+                  fetchMoreResult.channels.find((t) => t._id === i._id).posts.edges.length +
+                  i.posts.edges.length,
+              },
               edges: [
                 ...i.posts.edges,
                 ...fetchMoreResult.channels.find((m) => m._id === i._id).posts.edges,
@@ -153,10 +160,10 @@ const Messages = (props) => {
         <List>
           {messages && messages.length
             ? messages
-            .sort((a, b) => a.created_at - b.created_at)
-            .map((message, index) => (
-              <Message index={index} message={message} classes={classes} />
-            ))
+                .sort((a, b) => a.created_at - b.created_at)
+                .map((message, index) => (
+                  <Message index={index} message={message} classes={classes} />
+                ))
             : null}
         </List>
       </div>
