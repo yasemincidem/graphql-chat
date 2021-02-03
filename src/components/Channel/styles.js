@@ -41,6 +41,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   clickableIcons: {
     width: '15%',
+    right: 10
   },
   channelIcon: {
     paddingRight: 10,

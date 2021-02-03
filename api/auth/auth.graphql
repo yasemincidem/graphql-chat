@@ -19,5 +19,6 @@ type Mutation {
     login(input: AuthInput!): AuthPayload!
 }
 type Query {
-  getUser(id: ID!): User!
+  getUser(id: ID!): User!,
+  getUsers: [User!]
 }

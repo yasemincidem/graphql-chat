@@ -43,9 +43,7 @@ const Messages = (props) => {
         const channels = prev.channels.map((i) => {
           if (i._id === subscriptionData.data.newMessage.node.to) {
             return {
-              name: i.name,
-              description: i.description,
-              _id: i._id,
+              ...i,
               posts: {
                 pageInfo: prev.channels.find((t) => t._id === i._id).posts.pageInfo,
                 edges: [...i.posts.edges, subscriptionData.data.newMessage],
@@ -98,9 +96,7 @@ const Messages = (props) => {
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           const channels = prev.channels.map((i) => ({
-            name: i.name,
-            description: i.description,
-            _id: i._id,
+            ...i,
             posts: {
               pageInfo: {
                 hasPreviousPage: fetchMoreResult.channels.find((t) => t._id === i._id).posts

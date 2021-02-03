@@ -15,13 +15,24 @@ const createChannel = async (_, { input }, ctx) => {
   return channel;
 };
 const addPeopleToChannel = async (_, { input }, ctx) => {
-  const { email, channelId } = input;
+  const { email } = input;
   const currentUser = await ctx.models.user.findOne({ email });
   if (!currentUser) {
     throw new Error('There is no user related to the email');
   }
   delete currentUser['password'];
-  const currentChannel = await ctx.models.channel.findOne({ _id: channelId });
+  let currentChannel;
+  if (!input.channelId) {
+    const currentUser = await ctx.models.user.findOne({ email: input.owner });
+    currentChannel = await ctx.models.channel.create({
+      name: input.name,
+      description: '',
+      created_at: new Date().getTime(),
+      users: [currentUser],
+    });
+  } else {
+    currentChannel = await ctx.models.channel.findOne({ _id: input.channelId });
+  }
   if (!currentChannel) {
     throw new Error('There are no matching channels');
   }
@@ -30,15 +41,14 @@ const addPeopleToChannel = async (_, { input }, ctx) => {
   }
   const users = currentChannel ? [...currentChannel.users, currentUser] : [currentUser];
   const channel = await ctx.models.channel.findByIdAndUpdate(
-    { _id: channelId },
+    { _id: currentChannel._id },
     { users },
     { new: true },
   );
   return channel;
 };
-const channels = async (_, {userId}, ctx) => {
-  console.log('userId', userId);
-  const channels = await ctx.models.channel.find({'users._id': ObjectId(userId)});
+const channels = async (_, { userId }, ctx) => {
+  const channels = await ctx.models.channel.find({ 'users._id': ObjectId(userId) });
   return channels;
 };
 const channel = async (_, { id }, ctx) => {

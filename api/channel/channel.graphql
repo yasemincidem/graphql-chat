@@ -25,7 +25,9 @@ input ChannelInput {
 }
 input ChannelUserInput {
     email: String!
-    channelId: ID!
+    owner: String
+    channelId: ID
+    name: String
 }
 extend type Mutation {
     createChannel(input: ChannelInput!): Channel!

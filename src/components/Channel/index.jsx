@@ -16,6 +16,9 @@ import { ExpandLess, ExpandMore, Add } from '@material-ui/icons';
 import { useStyles } from './styles';
 import Messages from './Messages';
 import Navbar from '../Navbar';
+import InputLabel from '@material-ui/core/InputLabel/InputLabel';
+import Select from '@material-ui/core/Select/Select';
+import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 
 export const CHANNELS_QUERY = gql`
   query channels($userId: String!, $before: String) {
@@ -38,6 +41,22 @@ export const CHANNELS_QUERY = gql`
           }
         }
       }
+      users {
+        _id
+        email
+        name
+        surname
+      }
+    }
+  }
+`;
+export const GET_USERS_QUERY = gql`
+  query {
+    getUsers {
+      _id
+      email
+      name
+      surname
     }
   }
 `;
@@ -50,27 +69,60 @@ const CREATE_CHANNEL = gql`
     }
   }
 `;
+const ADD_USER_TO_CHANNEL = gql`
+  mutation AddPeopleToChannel($channelId: ID, $name: String, $owner: String, $email: String!) {
+    addPeopleToChannel(
+      input: { email: $email, owner: $owner, channelId: $channelId, name: $name }
+    ) {
+      _id
+      name
+      users {
+        _id
+        name
+      }
+    }
+  }
+`;
 const Channels = (props) => {
   const user = props.location?.state?.params || {};
   const classes = useStyles();
   const [open, setOpen] = useState(true);
+  const [openDirectMessages, setOpenDirectMessages] = useState(true);
   const [channelId, setChannel] = useState('');
   const [openModal, toggleModal] = useState(false);
+  const [openModalDirectMessages, toggleModalDirectMessages] = useState(false);
   const [channelName, setChannelName] = useState('');
   const [descriptionName, setDescriptionName] = useState('');
+  const [selectedUser, setUser] = useState({});
 
   const [createChannel, { data: dataCreatedChannel }] = useMutation(CREATE_CHANNEL, {
     refetchQueries: [{ query: CHANNELS_QUERY, variables: { userId: user._id } }],
   });
 
+  const [addUserToChannel, { data: dataAddUserToChannel }] = useMutation(ADD_USER_TO_CHANNEL, {
+    refetchQueries: [{ query: CHANNELS_QUERY, variables: { userId: user._id } }],
+  });
+
+  const { loading: loadingUsers, error: errorUsers, data: dataUsers } = useQuery(GET_USERS_QUERY);
+  const allUsers = dataUsers && Object.keys(dataUsers).length ? dataUsers.getUsers : [];
   const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
   if (loading) return <div>Channels loading ...</div>;
   if (error) return <div>Error in fetching channels</div>;
 
+  const allChannels =
+    data && data.channels ? data.channels.filter((channel) => channel.users.length !== 2) : [];
+
+  const directMessages =
+    data && data.channels ? data.channels.filter((channel) => channel.users.length === 2) : [];
+
   const handleClick = () => {
     setOpen(!open);
+  };
+
+  const handleClickDirectMessages = () => {
+    setOpenDirectMessages(!openDirectMessages);
   };
 
   const selectChannel = (channelId) => {
@@ -81,6 +133,20 @@ const Channels = (props) => {
     createChannel({
       variables: { name: channelName, description: descriptionName, email: user.email },
     });
+  };
+
+  const createNewDirectMessageGroup = () => {
+    addUserToChannel({
+      variables: {
+        name: `${selectedUser.name}, ${user.name}`,
+        owner: user.email,
+        email: selectedUser.email,
+      },
+    });
+  };
+
+  const handleChangeUser = (event) => {
+    setUser(event.target.value);
   };
 
   return (
@@ -105,7 +171,40 @@ const Channels = (props) => {
               </ListItem>
               <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding className={classes.list}>
-                  {data.channels.map((channel) => (
+                  {allChannels.map((channel) => (
+                    <ListItem
+                      button
+                      onClick={() => selectChannel(channel._id)}
+                      selected={channelId === channel._id}
+                      key={channel._id}
+                    >
+                      <ListItemText primary={`#\t${channel.name}`} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Collapse>
+            </List>
+            <List component="nav" aria-labelledby="nested-list-subheader" className={classes.root}>
+              <ListItem>
+                <ListItem
+                  button
+                  onClick={handleClickDirectMessages}
+                  className={classes.clickableIcons}
+                >
+                  {openDirectMessages ? <ExpandLess /> : <ExpandMore />}
+                </ListItem>
+                <ListItemText primary="Direct Messages" />
+                <ListItem
+                  button
+                  className={classes.clickableIcons}
+                  onClick={() => toggleModalDirectMessages(true)}
+                >
+                  <Add />
+                </ListItem>
+              </ListItem>
+              <Collapse in={openDirectMessages} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding className={classes.list}>
+                  {directMessages.map((channel) => (
                     <ListItem
                       button
                       onClick={() => selectChannel(channel._id)}
@@ -164,6 +263,41 @@ const Channels = (props) => {
           <div className={classes.createBtnGroup} onClick={() => createNewChannel()}>
             <Button variant="contained" color="default">
               Create
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+      <Dialog
+        className={classes.modal}
+        open={
+          openModalDirectMessages &&
+          !(dataAddUserToChannel && Object.keys(dataAddUserToChannel).length)
+        }
+        onClose={() => toggleModalDirectMessages(false)}
+      >
+        <div className={classes.paperModal}>
+          <h2 id="transition-modal-title">Add user to send a direct message</h2>
+          <div style={{ marginTop: '5%' }}>
+            <FormControl variant="outlined" fullWidth>
+              <InputLabel id="demo-simple-select-outlined-label">User</InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                value={selectedUser._id}
+                onChange={handleChangeUser}
+                label="User"
+              >
+                {allUsers.length
+                  ? allUsers.map((user) => (
+                      <MenuItem value={user} key={user}>{`${user.name} ${user.surname}`}</MenuItem>
+                    ))
+                  : []}
+              </Select>
+            </FormControl>
+          </div>
+          <div className={classes.createBtnGroup} onClick={() => createNewDirectMessageGroup()}>
+            <Button variant="contained" color="default">
+              Add
             </Button>
           </div>
         </div>

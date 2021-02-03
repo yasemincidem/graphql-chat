@@ -41,6 +41,10 @@ const getUser = async (_, { id }, ctx) => {
   const user = await ctx.models.user.findOne({ _id: id });
   return user;
 };
+const getUsers = async (_, {}, ctx) => {
+  const user = await ctx.models.user.find({});
+  return user;
+};
 module.exports = {
   Mutation: {
     signup,
@@ -48,5 +52,6 @@ module.exports = {
   },
   Query: {
     getUser,
-  }
+    getUsers,
+  },
 };
