@@ -45,7 +45,7 @@ const Register = () => {
   useEffect(() => {
     if (data && Object.keys(data).length) {
       localStorage.setItem('token', data.signup.token);
-      history.push('/channels');
+      history.push('/channels', {params: data.signup.user});
     }
   }, [data && Object.keys(data).length]);
 
@@ -122,12 +122,14 @@ const Register = () => {
             className={classes.submit}
             loading={loading}
             disabled={!isValid}
-            onClick={() =>
-              signup({
+            onClick={() => {
+              console.log('input', input);
+              return signup({
                 variables: {
                   input,
                 },
               })
+            }
             }
           >
             Sign Up

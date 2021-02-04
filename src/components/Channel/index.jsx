@@ -11,6 +11,7 @@ import {
   FormControl,
   Button,
   Dialog,
+  IconButton,
 } from '@material-ui/core';
 import { ExpandLess, ExpandMore, Add } from '@material-ui/icons';
 import { useStyles } from './styles';
@@ -19,6 +20,7 @@ import Navbar from '../Navbar';
 import InputLabel from '@material-ui/core/InputLabel/InputLabel';
 import Select from '@material-ui/core/Select/Select';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
+import PersonAddIcon from '@material-ui/core/SvgIcon/SvgIcon';
 
 export const CHANNELS_QUERY = gql`
   query channels($userId: String!, $before: String) {
@@ -105,9 +107,11 @@ const Channels = (props) => {
 
   const { loading: loadingUsers, error: errorUsers, data: dataUsers } = useQuery(GET_USERS_QUERY);
   const allUsers = dataUsers && Object.keys(dataUsers).length ? dataUsers.getUsers : [];
+  const filteredAllUsers = allUsers && allUsers.length ? allUsers.filter((u) => u._id !== user._id) : [];
   const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
+
   if (loading) return <div>Channels loading ...</div>;
   if (error) return <div>Error in fetching channels</div>;
 
@@ -151,7 +155,7 @@ const Channels = (props) => {
 
   return (
     <div className={classes.container}>
-      <Navbar />
+      <Navbar userName={`${user.name} ${user.surname}`}/>
       <Grid container>
         <Grid item xs={2}>
           <Card className={classes.paper} style={{ backgroundColor: '#880e4f' }}>
@@ -221,6 +225,9 @@ const Channels = (props) => {
         </Grid>
         <Grid item xs={10}>
           <Card className={classes.paper}>
+            <IconButton aria-label="show 4 new mails" color="inherit">
+              <PersonAddIcon />
+            </IconButton>
             <Messages
               user={props.location?.state?.params || ''}
               classes={classes}
@@ -287,9 +294,9 @@ const Channels = (props) => {
                 onChange={handleChangeUser}
                 label="User"
               >
-                {allUsers.length
-                  ? allUsers.map((user) => (
-                      <MenuItem value={user} key={user}>{`${user.name} ${user.surname}`}</MenuItem>
+                {filteredAllUsers.length
+                  ? filteredAllUsers.map((u) => (
+                      <MenuItem value={u} key={u}>{`${u.name} ${u.surname}`}</MenuItem>
                     ))
                   : []}
               </Select>

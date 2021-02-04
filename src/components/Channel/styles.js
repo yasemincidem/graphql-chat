@@ -25,7 +25,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   container: {
     flexGrow: 1,
-    margin: -8
+    margin: -8,
   },
   margin: theme.spacing(1),
   buttonWrapper: { position: 'absolute', bottom: 20, width: '97%' },
@@ -41,7 +41,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   clickableIcons: {
     width: '15%',
-    right: 10
+    right: 10,
   },
   channelIcon: {
     paddingRight: 10,
@@ -56,8 +56,8 @@ export const useStyles = makeStyles((theme) => ({
     marginTop: '10%',
   },
   boldChannel: {
-    fontWeight: 600
-  }
+    fontWeight: 600,
+  },
 }));
 export const ValidationTextField = withStyles({
   root: {

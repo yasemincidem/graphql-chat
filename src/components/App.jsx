@@ -48,7 +48,7 @@ const App = () => {
         <Switch>
           <Route path="/channels" component={!isAuthed ? Login : Channels} />
           <Route path="/login" component={Login} />
-          <Route path="/register" component={!isAuthed ? Register : Login} />
+          <Route path="/register" component={Register} />
           <Route path="/" exact component={Login} />
         </Switch>
       </Router>

@@ -1,8 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMutation, gql } from '@apollo/client';
-import { FormControl, List, CircularProgress, Divider, Typography, Box } from '@material-ui/core';
+import {
+  FormControl,
+  List,
+  CircularProgress,
+  Divider,
+  Typography,
+  Box,
+  IconButton,
+  Toolbar,
+  Badge,
+} from '@material-ui/core';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { ValidationTextField } from './styles';
 import Message from './Message';
+import MenuIcon from '@material-ui/core/SvgIcon/SvgIcon';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
