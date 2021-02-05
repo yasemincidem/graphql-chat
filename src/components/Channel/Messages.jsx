@@ -14,7 +14,6 @@ import {
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { ValidationTextField } from './styles';
 import Message from './Message';
-import MenuIcon from '@material-ui/core/SvgIcon/SvgIcon';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
@@ -41,7 +40,7 @@ const MESSAGES_SUBSCRIPTION = gql`
 `;
 
 const Messages = (props) => {
-  const { classes, fetchMore, subscribeToMore, data, channelId, user } = props;
+  const { classes, fetchMore, subscribeToMore, data, channelId, user, addUserToChannel } = props;
   const messageEl = useRef(null);
   const [message, setMessage] = useState('');
   const [messageSuccess, setMessageSuccess] = useState(false);
@@ -147,23 +146,29 @@ const Messages = (props) => {
       setMessage('');
     }
   };
+
   return (
     <div className={classes.buttonWrapper}>
       <div className={classes.messagesGroup} ref={messageEl}>
         {loadingMessages === true ? <CircularProgress color="secondary" /> : null}
-        <Typography component="div">
-          <Box
-            fontWeight="fontWeightBold"
-            fontSize="h6.fontSize"
-            color="black"
-            style={{ paddingLeft: 16 }}
-          >
-            {channel?.name ? `# ${channel.name}` : ''}
-          </Box>
-          <Box fontSize="normal" color="black" style={{ paddingLeft: 16 }}>
-            {channel?.description || ''}
-          </Box>
-        </Typography>
+        <div style={{ flexDirection:  'row', flex: 1, display: 'flex', justifyContent: 'space-between' }}>
+          <Typography component="div">
+            <Box
+              fontWeight="fontWeightBold"
+              fontSize="h6.fontSize"
+              color="black"
+              style={{ paddingLeft: 16 }}
+            >
+              {channel?.name ? `# ${channel.name}` : ''}
+            </Box>
+            <Box fontSize="normal" color="black" style={{ paddingLeft: 16 }}>
+              {channel?.description || ''}
+            </Box>
+          </Typography>
+          {channel && channel.users && channel.users.length === 2 ? null : (<IconButton onClick={() => addUserToChannel(channel._id)}>
+            <PersonAddIcon />
+          </IconButton>)}
+        </div>
         <Divider />
         <List>
           {messages && messages.length

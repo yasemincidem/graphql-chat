@@ -63,8 +63,8 @@ export const GET_USERS_QUERY = gql`
   }
 `;
 const CREATE_CHANNEL = gql`
-  mutation CreateChannel($name: String!, $description: String, $email: String!) {
-    createChannel(input: { name: $name, description: $description, email: $email }) {
+  mutation CreateChannel($name: String!, $description: String, $email: String!, $channelId: ID) {
+    createChannel(input: { name: $name, description: $description, email: $email, channelId: $channelId }) {
       _id
       name
       description
@@ -96,6 +96,7 @@ const Channels = (props) => {
   const [channelName, setChannelName] = useState('');
   const [descriptionName, setDescriptionName] = useState('');
   const [selectedUser, setUser] = useState({});
+  const [selectedChannelIdForAddingUser, setChannelIdForAddingUser] = useState(null);
 
   const [createChannel, { data: dataCreatedChannel }] = useMutation(CREATE_CHANNEL, {
     refetchQueries: [{ query: CHANNELS_QUERY, variables: { userId: user._id } }],
@@ -107,7 +108,8 @@ const Channels = (props) => {
 
   const { loading: loadingUsers, error: errorUsers, data: dataUsers } = useQuery(GET_USERS_QUERY);
   const allUsers = dataUsers && Object.keys(dataUsers).length ? dataUsers.getUsers : [];
-  const filteredAllUsers = allUsers && allUsers.length ? allUsers.filter((u) => u._id !== user._id) : [];
+  const filteredAllUsers =
+    allUsers && allUsers.length ? allUsers.filter((u) => u._id !== user._id) : [];
   const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
@@ -140,13 +142,23 @@ const Channels = (props) => {
   };
 
   const createNewDirectMessageGroup = () => {
-    addUserToChannel({
-      variables: {
-        name: `${selectedUser.name}, ${user.name}`,
-        owner: user.email,
-        email: selectedUser.email,
-      },
-    });
+    const channelId = selectedChannelIdForAddingUser;
+    if (channelId) {
+      addUserToChannel({
+        variables: {
+          email: selectedUser.email,
+          channelId,
+        },
+      });
+    } else {
+      addUserToChannel({
+        variables: {
+          name: `${selectedUser.name}, ${user.name}`,
+          owner: user.email,
+          email: selectedUser.email,
+        },
+      });
+    }
   };
 
   const handleChangeUser = (event) => {
@@ -155,7 +167,7 @@ const Channels = (props) => {
 
   return (
     <div className={classes.container}>
-      <Navbar userName={`${user.name} ${user.surname}`}/>
+      <Navbar userName={`${user.name} ${user.surname}`} />
       <Grid container>
         <Grid item xs={2}>
           <Card className={classes.paper} style={{ backgroundColor: '#880e4f' }}>
@@ -236,6 +248,10 @@ const Channels = (props) => {
               data={data}
               loading={loading}
               channelId={channelId}
+              addUserToChannel={(id) => {
+                setChannelIdForAddingUser(id);
+                toggleModalDirectMessages(true);
+              }}
             />
           </Card>
         </Grid>
