@@ -8,12 +8,13 @@ import {
   Typography,
   Box,
   IconButton,
-  Toolbar,
-  Badge,
+  Dialog,
 } from '@material-ui/core';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { ValidationTextField } from './styles';
 import Message from './Message';
+import PeopleIcon from '@material-ui/icons/People';
+import InputLabel from '@material-ui/core/InputLabel/InputLabel';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
@@ -45,6 +46,7 @@ const Messages = (props) => {
   const [message, setMessage] = useState('');
   const [messageSuccess, setMessageSuccess] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState('false');
+  const [allUsersOfChannel, toggleAllUsersOfChannel] = useState(false);
   const [sendMessage] = useMutation(SEND_MESSAGE);
 
   useEffect(() => {
@@ -151,7 +153,14 @@ const Messages = (props) => {
     <div className={classes.buttonWrapper}>
       <div className={classes.messagesGroup} ref={messageEl}>
         {loadingMessages === true ? <CircularProgress color="secondary" /> : null}
-        <div style={{ flexDirection:  'row', flex: 1, display: 'flex', justifyContent: 'space-between' }}>
+        <div
+          style={{
+            flexDirection: 'row',
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
           <Typography component="div">
             <Box
               fontWeight="fontWeightBold"
@@ -165,9 +174,18 @@ const Messages = (props) => {
               {channel?.description || ''}
             </Box>
           </Typography>
-          {channel && channel.users && channel.users.length === 2 ? null : (<IconButton onClick={() => addUserToChannel(channel._id)}>
-            <PersonAddIcon />
-          </IconButton>)}
+          <div>
+            {channel && channel.isDirectMessage === true ? null : (
+              <IconButton onClick={() => addUserToChannel(channel._id)}>
+                <PersonAddIcon />
+              </IconButton>
+            )}
+            {channel && channel.isDirectMessage === true ? null : (
+              <IconButton onClick={() => toggleAllUsersOfChannel(true)}>
+                <PeopleIcon />
+              </IconButton>
+            )}
+          </div>
         </div>
         <Divider />
         <List>
@@ -192,6 +210,22 @@ const Messages = (props) => {
           id="validation-outlined-input"
         />
       </FormControl>
+      <Dialog
+        className={classes.modal}
+        open={allUsersOfChannel}
+        onClose={() => toggleAllUsersOfChannel(false)}
+      >
+        <div className={classes.paperModal}>
+          <h2 id="transition-modal-title">{`${channel && channel.users.length} members in #${channel && channel.name}`}</h2>
+          <div style={{ marginTop: '5%' }}>
+            <FormControl variant="outlined" fullWidth>
+              {channel && channel.users.length
+                ? channel.users.map((u) => <div key={u._id}>{`${u.name} ${u.surname}`}</div>)
+                : []}
+            </FormControl>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 };

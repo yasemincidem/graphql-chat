@@ -10,6 +10,10 @@ const ChannelSchema = new Schema({
     type: String,
     required: false
   },
+  isDirectMessage: {
+    type: Boolean,
+    required: false
+  },
   created_at: {
     type: String,
     required: true

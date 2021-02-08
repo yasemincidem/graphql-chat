@@ -28,6 +28,7 @@ export const CHANNELS_QUERY = gql`
       _id
       name
       description
+      isDirectMessage
       posts(last: 25, before: $before) {
         pageInfo {
           hasPreviousPage
@@ -63,8 +64,8 @@ export const GET_USERS_QUERY = gql`
   }
 `;
 const CREATE_CHANNEL = gql`
-  mutation CreateChannel($name: String!, $description: String, $email: String!, $channelId: ID) {
-    createChannel(input: { name: $name, description: $description, email: $email, channelId: $channelId }) {
+  mutation CreateChannel($name: String!, $description: String, $email: String!) {
+    createChannel(input: { name: $name, description: $description, email: $email}) {
       _id
       name
       description
@@ -118,10 +119,10 @@ const Channels = (props) => {
   if (error) return <div>Error in fetching channels</div>;
 
   const allChannels =
-    data && data.channels ? data.channels.filter((channel) => channel.users.length !== 2) : [];
+    data && data.channels ? data.channels.filter((channel) => !channel.isDirectMessage) : [];
 
   const directMessages =
-    data && data.channels ? data.channels.filter((channel) => channel.users.length === 2) : [];
+    data && data.channels ? data.channels.filter((channel) => channel.isDirectMessage) : [];
 
   const handleClick = () => {
     setOpen(!open);
@@ -139,6 +140,7 @@ const Channels = (props) => {
     createChannel({
       variables: { name: channelName, description: descriptionName, email: user.email },
     });
+    toggleModal(false);
   };
 
   const createNewDirectMessageGroup = () => {
@@ -159,6 +161,7 @@ const Channels = (props) => {
         },
       });
     }
+    toggleModalDirectMessages(false);
   };
 
   const handleChangeUser = (event) => {
@@ -237,9 +240,6 @@ const Channels = (props) => {
         </Grid>
         <Grid item xs={10}>
           <Card className={classes.paper}>
-            <IconButton aria-label="show 4 new mails" color="inherit">
-              <PersonAddIcon />
-            </IconButton>
             <Messages
               user={props.location?.state?.params || ''}
               classes={classes}
@@ -258,7 +258,7 @@ const Channels = (props) => {
       </Grid>
       <Dialog
         className={classes.modal}
-        open={openModal && !(dataCreatedChannel && Object.keys(dataCreatedChannel).length)}
+        open={openModal}
         onClose={() => toggleModal(false)}
       >
         <div className={classes.paperModal}>
@@ -292,10 +292,7 @@ const Channels = (props) => {
       </Dialog>
       <Dialog
         className={classes.modal}
-        open={
-          openModalDirectMessages &&
-          !(dataAddUserToChannel && Object.keys(dataAddUserToChannel).length)
-        }
+        open={openModalDirectMessages}
         onClose={() => toggleModalDirectMessages(false)}
       >
         <div className={classes.paperModal}>

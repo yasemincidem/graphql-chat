@@ -10,6 +10,7 @@ const createChannel = async (_, { input }, ctx) => {
     name,
     description,
     created_at: new Date().getTime(),
+    isDirectMessage: false,
     users: [user],
   });
   return channel;
@@ -28,6 +29,7 @@ const addPeopleToChannel = async (_, { input }, ctx) => {
       name: input.name,
       description: '',
       created_at: new Date().getTime(),
+      isDirectMessage: true,
       users: [currentUser],
     });
   } else {

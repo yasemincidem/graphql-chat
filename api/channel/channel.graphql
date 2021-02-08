@@ -15,6 +15,7 @@ type Channel {
     name: String!
     description: String
     created_at: String
+    isDirectMessage: Boolean
     users: [User]!
     posts(last: Int!, before: String): ChannelPostsConnection!
 }
