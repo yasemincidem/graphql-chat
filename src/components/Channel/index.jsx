@@ -239,7 +239,7 @@ const Channels = (props) => {
           </Card>
         </Grid>
         <Grid item xs={10}>
-          <Card className={classes.paper}>
+          <Card className={classes.paper2}>
             <Messages
               user={props.location?.state?.params || ''}
               classes={classes}

@@ -17,6 +17,12 @@ export const useStyles = makeStyles((theme) => ({
     overflow: 'auto',
     maxHeight: 874,
   },
+  paper2: {
+    height: '874px',
+    position: 'relative',
+    overflow: 'auto',
+    maxHeight: 874,
+  },
   paperModal: {
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
@@ -28,13 +34,13 @@ export const useStyles = makeStyles((theme) => ({
     margin: -8,
   },
   margin: theme.spacing(1),
-  buttonWrapper: { position: 'absolute', bottom: 20, width: '97%' },
+  buttonWrapper: { position: 'absolute', bottom: 0, width: '99%' },
   iconButton: {
     padding: 10,
   },
   messagesGroup: {
     overflow: 'auto',
-    height: '750px',
+    height: '705px',
   },
   list: {
     paddingLeft: '10%',
@@ -57,6 +63,21 @@ export const useStyles = makeStyles((theme) => ({
   },
   boldChannel: {
     fontWeight: 600,
+  },
+  wrapperClass: {
+    padding: '0.7rem 0rem 0.7rem 0.7rem',
+  },
+  editorClass: {
+    border: '1px solid #ccc',
+    padding: '0px 0px 0px 5px',
+    borderRadius: '0px 0px 5px 5px',
+    borderColor: 'transparent black black',
+  },
+  toolbarClass: {
+    borderRadius: '5px 5px 0px 0px',
+    borderColor: 'black black #d6d6d6',
+    backgroundColor: '#f1f1f1',
+    marginBottom: 0,
   },
 }));
 export const ValidationTextField = withStyles({

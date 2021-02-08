@@ -11,10 +11,11 @@ import {
   Dialog,
 } from '@material-ui/core';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import { ValidationTextField } from './styles';
-import Message from './Message';
 import PeopleIcon from '@material-ui/icons/People';
-import InputLabel from '@material-ui/core/InputLabel/InputLabel';
+import { EditorState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import Message from './Message';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($to: String!, $from: String!, $text: String!) {
@@ -48,7 +49,8 @@ const Messages = (props) => {
   const [loadingMessages, setLoadingMessages] = useState('false');
   const [allUsersOfChannel, toggleAllUsersOfChannel] = useState(false);
   const [sendMessage] = useMutation(SEND_MESSAGE);
-
+  const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+  const editor = React.useRef(null);
   useEffect(() => {
     subscribeToMore({
       document: MESSAGES_SUBSCRIPTION,
@@ -131,9 +133,6 @@ const Messages = (props) => {
     }
   };
 
-  const handleChange = (event) => {
-    setMessage(event.target.value);
-  };
 
   const keyPress = (e) => {
     if (e.keyCode == 13) {
@@ -141,14 +140,16 @@ const Messages = (props) => {
         variables: {
           from: user._id,
           to: channelId,
-          text: message,
+          text: editorState,
         },
       });
       setMessageSuccess(true);
       setMessage('');
     }
   };
-
+  const focusEditor = () => {
+    editor.current.focus();
+  };
   return (
     <div className={classes.buttonWrapper}>
       <div className={classes.messagesGroup} ref={messageEl}>
@@ -198,25 +199,30 @@ const Messages = (props) => {
             : null}
         </List>
       </div>
-      <FormControl fullWidth className={classes.margin}>
-        <ValidationTextField
-          className={classes.margin}
-          label="Text Message"
-          onKeyDown={keyPress}
-          onChange={handleChange}
-          required
-          value={message}
-          variant="outlined"
-          id="validation-outlined-input"
-        />
-      </FormControl>
+      <Editor
+        defaultEditorState={editorState}
+        onEditorStateChange={setEditorState}
+        keyBindingFn={(event) => console.log('event', event)}
+        wrapperClassName={classes.wrapperClass}
+        editorClassName={classes.editorClass}
+        toolbarClassName={classes.toolbarClass}
+        toolbar={{
+          inline: { inDropdown: true },
+          list: { inDropdown: true },
+          textAlign: { inDropdown: true },
+          link: { inDropdown: true },
+          history: { inDropdown: true },
+        }}
+      />
       <Dialog
         className={classes.modal}
         open={allUsersOfChannel}
         onClose={() => toggleAllUsersOfChannel(false)}
       >
         <div className={classes.paperModal}>
-          <h2 id="transition-modal-title">{`${channel && channel.users.length} members in #${channel && channel.name}`}</h2>
+          <h2 id="transition-modal-title">{`${channel && channel.users.length} members in #${
+            channel && channel.name
+          }`}</h2>
           <div style={{ marginTop: '5%' }}>
             <FormControl variant="outlined" fullWidth>
               {channel && channel.users.length
