@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import PeopleIcon from '@material-ui/icons/People';
-import { EditorState } from 'draft-js';
+import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import Message from './Message';
@@ -133,23 +133,20 @@ const Messages = (props) => {
     }
   };
 
-
-  const keyPress = (e) => {
-    if (e.keyCode == 13) {
+  const keyPress = (event) => {
+    if (event.key == 'Enter') {
       sendMessage({
         variables: {
           from: user._id,
           to: channelId,
-          text: editorState,
+          text: editorState.getCurrentContent().getPlainText(),
         },
       });
       setMessageSuccess(true);
-      setMessage('');
+      setEditorState(EditorState.createEmpty());
     }
   };
-  const focusEditor = () => {
-    editor.current.focus();
-  };
+
   return (
     <div className={classes.buttonWrapper}>
       <div className={classes.messagesGroup} ref={messageEl}>
@@ -200,19 +197,9 @@ const Messages = (props) => {
         </List>
       </div>
       <Editor
-        defaultEditorState={editorState}
+        editorState={editorState}
         onEditorStateChange={setEditorState}
-        keyBindingFn={(event) => console.log('event', event)}
-        wrapperClassName={classes.wrapperClass}
-        editorClassName={classes.editorClass}
-        toolbarClassName={classes.toolbarClass}
-        toolbar={{
-          inline: { inDropdown: true },
-          list: { inDropdown: true },
-          textAlign: { inDropdown: true },
-          link: { inDropdown: true },
-          history: { inDropdown: true },
-        }}
+        keyBindingFn={keyPress}
       />
       <Dialog
         className={classes.modal}

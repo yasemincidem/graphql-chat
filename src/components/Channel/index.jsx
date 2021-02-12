@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import {
   List,
@@ -10,8 +10,7 @@ import {
   TextField,
   FormControl,
   Button,
-  Dialog,
-  IconButton,
+  Dialog
 } from '@material-ui/core';
 import { ExpandLess, ExpandMore, Add } from '@material-ui/icons';
 import { useStyles } from './styles';
@@ -20,7 +19,6 @@ import Navbar from '../Navbar';
 import InputLabel from '@material-ui/core/InputLabel/InputLabel';
 import Select from '@material-ui/core/Select/Select';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
-import PersonAddIcon from '@material-ui/core/SvgIcon/SvgIcon';
 
 export const CHANNELS_QUERY = gql`
   query channels($userId: String!, $before: String) {
@@ -65,7 +63,7 @@ export const GET_USERS_QUERY = gql`
 `;
 const CREATE_CHANNEL = gql`
   mutation CreateChannel($name: String!, $description: String, $email: String!) {
-    createChannel(input: { name: $name, description: $description, email: $email}) {
+    createChannel(input: { name: $name, description: $description, email: $email }) {
       _id
       name
       description
@@ -123,6 +121,10 @@ const Channels = (props) => {
 
   const directMessages =
     data && data.channels ? data.channels.filter((channel) => channel.isDirectMessage) : [];
+
+  if (allChannels && allChannels.length && !channelId) {
+    setChannel(allChannels[0]._id);
+  }
 
   const handleClick = () => {
     setOpen(!open);
@@ -240,7 +242,8 @@ const Channels = (props) => {
         </Grid>
         <Grid item xs={10}>
           <Card className={classes.paper2}>
-            <Messages
+            {!channelId && <div className={classes.channelNotFound}>Channel is not found</div>}
+            {channelId && (<Messages
               user={props.location?.state?.params || ''}
               classes={classes}
               fetchMore={fetchMore}
@@ -252,15 +255,11 @@ const Channels = (props) => {
                 setChannelIdForAddingUser(id);
                 toggleModalDirectMessages(true);
               }}
-            />
+            />)}
           </Card>
         </Grid>
       </Grid>
-      <Dialog
-        className={classes.modal}
-        open={openModal}
-        onClose={() => toggleModal(false)}
-      >
+      <Dialog className={classes.modal} open={openModal} onClose={() => toggleModal(false)}>
         <div className={classes.paperModal}>
           <h2 id="transition-modal-title">Create Channel</h2>
           <FormControl fullWidth>

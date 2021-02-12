@@ -79,6 +79,11 @@ export const useStyles = makeStyles((theme) => ({
     backgroundColor: '#f1f1f1',
     marginBottom: 0,
   },
+  channelNotFound: {
+    fontSize: 30,
+    textAlign: 'center',
+    marginTop: '50%',
+  },
 }));
 export const ValidationTextField = withStyles({
   root: {
