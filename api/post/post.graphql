@@ -15,6 +15,7 @@ extend type Mutation {
 type ChannelPostsSubscriptionEdge {
   node: Post!
   cursor: String!
+  channel: Channel
 }
 type Subscription {
     newMessage: ChannelPostsSubscriptionEdge!

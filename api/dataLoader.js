@@ -1,12 +1,17 @@
 const DataLoader = require('dataloader');
 const Users = require('./auth/user.model');
 const Posts = require('./post/post.model');
+const Channels = require('./channel/channel.model');
 
 const batchChannelUsers = async (userIds) => {
   const promises = userIds.map(async (key) => {
     return await Users.find({ _id: { $in: key.map((i) => i._id) } });
   });
   return Promise.all(promises);
+};
+const batchChannels = async (keys) => {
+  const channels = await Channels.find({ _id: { $in: keys[0].id } });
+  return Promise.all(keys.map(() => channels));
 };
 const batchChannelPosts = async (keys) => {
   const id = keys.length ? keys[0].id : '';
@@ -26,7 +31,13 @@ const batchChannelPosts = async (keys) => {
   const edges = results.map(async (post) => {
     const buffer = new Buffer(post.id);
     const cursor = buffer.toString('base64');
-    const newPost = { _id: post._id, text: post.text, created_at: post.created_at, from: post.from, to: post.to };
+    const newPost = {
+      _id: post._id,
+      text: post.text,
+      created_at: post.created_at,
+      from: post.from,
+      to: post.to,
+    };
     return {
       node: newPost,
       cursor,
@@ -46,4 +57,5 @@ const batchChannelPosts = async (keys) => {
 module.exports = {
   loaderChannelUsers: () => new DataLoader(batchChannelUsers),
   loaderChannelPosts: () => new DataLoader(batchChannelPosts),
+  loaderChannels: () => new DataLoader(batchChannels),
 };

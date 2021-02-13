@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import PeopleIcon from '@material-ui/icons/People';
-import { EditorState, convertToRaw } from 'draft-js';
+import { EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import Message from './Message';
@@ -36,38 +36,75 @@ const MESSAGES_SUBSCRIPTION = gql`
         from
         created_at
       }
+      channel {
+        _id
+        name
+        description
+        isDirectMessage
+        posts(last: 25) {
+          pageInfo {
+            hasPreviousPage
+            matchCount
+          }
+          edges {
+            cursor
+            node {
+              to
+              from
+              text
+              created_at
+            }
+          }
+        }
+        users {
+          _id
+          email
+          name
+          surname
+        }
+      }
       cursor
     }
   }
 `;
 
 const Messages = (props) => {
-  const { classes, fetchMore, subscribeToMore, data, channelId, user, addUserToChannel } = props;
+  const { classes, fetchMore, subscribeToMore, data, channelId, user, addUserToChannel, setNotificationId } = props;
   const messageEl = useRef(null);
-  const [message, setMessage] = useState('');
   const [messageSuccess, setMessageSuccess] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState('false');
   const [allUsersOfChannel, toggleAllUsersOfChannel] = useState(false);
   const [sendMessage] = useMutation(SEND_MESSAGE);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
-  const editor = React.useRef(null);
+
   useEffect(() => {
     subscribeToMore({
       document: MESSAGES_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
-        const channels = prev.channels.map((i) => {
-          if (i._id === subscriptionData.data.newMessage.node.to) {
-            return {
-              ...i,
-              posts: {
-                pageInfo: prev.channels.find((t) => t._id === i._id).posts.pageInfo,
-                edges: [...i.posts.edges, subscriptionData.data.newMessage],
-              },
-            };
-          } else {
-            return i;
-          }
-        });
+        setNotificationId(subscriptionData.data.newMessage.node);
+        let channels = [];
+        if (
+          !prev.channels.find(
+            (channel) => channel._id === subscriptionData.data.newMessage.node.to,
+          ) &&
+          subscriptionData.data.newMessage.channel.users.find((u) => u._id === user._id)
+        ) {
+          channels = [...prev.channels, subscriptionData.data.newMessage.channel];
+        } else {
+          channels = prev.channels.map((i) => {
+            if (i._id === subscriptionData.data.newMessage.node.to) {
+              return {
+                ...i,
+                posts: {
+                  pageInfo: prev.channels.find((t) => t._id === i._id).posts.pageInfo,
+                  edges: [...i.posts.edges],
+                },
+              };
+            } else {
+              return i;
+            }
+          });
+        }
         return { channels };
       },
     });

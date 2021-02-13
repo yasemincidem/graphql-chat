@@ -10,7 +10,7 @@ import {
   TextField,
   FormControl,
   Button,
-  Dialog
+  Dialog,
 } from '@material-ui/core';
 import { ExpandLess, ExpandMore, Add } from '@material-ui/icons';
 import { useStyles } from './styles';
@@ -96,6 +96,7 @@ const Channels = (props) => {
   const [descriptionName, setDescriptionName] = useState('');
   const [selectedUser, setUser] = useState({});
   const [selectedChannelIdForAddingUser, setChannelIdForAddingUser] = useState(null);
+  const [notificationIds, setNotificationId] = useState([]);
 
   const [createChannel, { data: dataCreatedChannel }] = useMutation(CREATE_CHANNEL, {
     refetchQueries: [{ query: CHANNELS_QUERY, variables: { userId: user._id } }],
@@ -170,6 +171,7 @@ const Channels = (props) => {
     setUser(event.target.value);
   };
 
+  console.log('notificationId', notificationIds);
   return (
     <div className={classes.container}>
       <Navbar userName={`${user.name} ${user.surname}`} />
@@ -197,6 +199,13 @@ const Channels = (props) => {
                       button
                       onClick={() => selectChannel(channel._id)}
                       selected={channelId === channel._id}
+                      style={{
+                        backgroundColor: notificationIds.find(
+                          (i) => i.to === channel._id && i.from !== user._id,
+                        )
+                          ? 'red'
+                          : 'transparent',
+                      }}
                       key={channel._id}
                     >
                       <ListItemText primary={`#\t${channel.name}`} />
@@ -231,6 +240,13 @@ const Channels = (props) => {
                       onClick={() => selectChannel(channel._id)}
                       selected={channelId === channel._id}
                       key={channel._id}
+                      style={{
+                        backgroundColor: notificationIds.find(
+                          (i) => i.to === channel._id && i.from !== user._id,
+                        )
+                          ? 'red'
+                          : 'transparent',
+                      }}
                     >
                       <ListItemText primary={`#\t${channel.name}`} />
                     </ListItem>
@@ -243,19 +259,25 @@ const Channels = (props) => {
         <Grid item xs={10}>
           <Card className={classes.paper2}>
             {!channelId && <div className={classes.channelNotFound}>Channel is not found</div>}
-            {channelId && (<Messages
-              user={props.location?.state?.params || ''}
-              classes={classes}
-              fetchMore={fetchMore}
-              subscribeToMore={subscribeToMore}
-              data={data}
-              loading={loading}
-              channelId={channelId}
-              addUserToChannel={(id) => {
-                setChannelIdForAddingUser(id);
-                toggleModalDirectMessages(true);
-              }}
-            />)}
+            {channelId && (
+              <Messages
+                user={props.location?.state?.params || ''}
+                classes={classes}
+                fetchMore={fetchMore}
+                subscribeToMore={subscribeToMore}
+                data={data}
+                loading={loading}
+                channelId={channelId}
+                addUserToChannel={(id) => {
+                  setChannelIdForAddingUser(id);
+                  toggleModalDirectMessages(true);
+                }}
+                setNotificationId={(node) => {
+                  notificationIds.push(node);
+                  setNotificationId(notificationIds);
+                }}
+              />
+            )}
           </Card>
         </Grid>
       </Grid>
