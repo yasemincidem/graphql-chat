@@ -19,6 +19,8 @@ import Navbar from '../Navbar';
 import InputLabel from '@material-ui/core/InputLabel/InputLabel';
 import Select from '@material-ui/core/Select/Select';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const CHANNELS_QUERY = gql`
   query channels($userId: String!, $before: String) {
@@ -204,7 +206,6 @@ const Channels = (props) => {
     setUserId(event.target.value);
   };
 
-  console.log('notificationId', selectedUserId);
   return (
     <div className={classes.container}>
       <Navbar userName={`${user.name} ${user.surname}`} />
@@ -351,6 +352,12 @@ const Channels = (props) => {
                 }}
                 setNotificationId={(node) => {
                   notificationIds.push(node);
+                  if (
+                    node.from !== user._id &&
+                    data.channels.find((channel) => node.to === channel._id)
+                  ) {
+                    toast(node.text);
+                  }
                   setNotificationId(notificationIds);
                 }}
               />
@@ -413,13 +420,17 @@ const Channels = (props) => {
               </Select>
             </FormControl>
           </div>
-          <div className={classes.createBtnGroup} onClick={() => createNewDirectMessageGroup()}>
+          <div
+            className={classes.createBtnGroup}
+            onClick={() => (selectedUserId ? createNewDirectMessageGroup() : null)}
+          >
             <Button variant="contained" color="default">
               Add
             </Button>
           </div>
         </div>
       </Dialog>
+      <ToastContainer />
     </div>
   );
 };
