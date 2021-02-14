@@ -82,29 +82,19 @@ const Messages = (props) => {
       document: MESSAGES_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
         setNotificationId(subscriptionData.data.newMessage.node);
-        let channels = [];
-        if (
-          !prev.channels.find(
-            (channel) => channel._id === subscriptionData.data.newMessage.node.to,
-          ) &&
-          subscriptionData.data.newMessage.channel.users.find((u) => u._id === user._id)
-        ) {
-          channels = [...prev.channels, subscriptionData.data.newMessage.channel];
-        } else {
-          channels = prev.channels.map((i) => {
-            if (i._id === subscriptionData.data.newMessage.node.to) {
-              return {
-                ...i,
-                posts: {
-                  pageInfo: prev.channels.find((t) => t._id === i._id).posts.pageInfo,
-                  edges: [...i.posts.edges],
-                },
-              };
-            } else {
-              return i;
-            }
-          });
-        }
+        const channels = prev.channels.map((i) => {
+          if (i._id === subscriptionData.data.newMessage.node.to) {
+            return {
+              ...i,
+              posts: {
+                pageInfo: prev.channels.find((t) => t._id === i._id).posts.pageInfo,
+                edges: [...i.posts.edges],
+              },
+            };
+          } else {
+            return i;
+          }
+        });
         return { channels };
       },
     });

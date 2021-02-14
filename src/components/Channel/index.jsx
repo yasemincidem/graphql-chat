@@ -84,6 +84,16 @@ const ADD_USER_TO_CHANNEL = gql`
     }
   }
 `;
+const NEW_USER_ADDED_SUBSCRIPTION = gql`
+  subscription {
+    newUserAddedToChannel {
+      _id
+      name
+      description
+      isDirectMessage
+    }
+  }
+`;
 const Channels = (props) => {
   const user = props.location?.state?.params || {};
   const classes = useStyles();
@@ -94,7 +104,7 @@ const Channels = (props) => {
   const [openModalDirectMessages, toggleModalDirectMessages] = useState(false);
   const [channelName, setChannelName] = useState('');
   const [descriptionName, setDescriptionName] = useState('');
-  const [selectedUser, setUser] = useState({});
+  const [selectedUserId, setUserId] = useState('');
   const [selectedChannelIdForAddingUser, setChannelIdForAddingUser] = useState(null);
   const [notificationIds, setNotificationId] = useState([]);
 
@@ -113,6 +123,19 @@ const Channels = (props) => {
   const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
+
+  useEffect(() => {
+    subscribeToMore({
+      document: NEW_USER_ADDED_SUBSCRIPTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        let channels = [];
+        if (!prev.channels.find((channel) => channel._id === subscriptionData._id)) {
+          channels = [...prev.channels, subscriptionData];
+        }
+        return { channels };
+      },
+    });
+  }, []);
 
   if (loading) return <div>Channels loading ...</div>;
   if (error) return <div>Error in fetching channels</div>;
@@ -149,6 +172,7 @@ const Channels = (props) => {
 
   const createNewDirectMessageGroup = () => {
     const channelId = selectedChannelIdForAddingUser;
+    const selectedUser = filteredAllUsers.find((user) => user._id === selectedUserId);
     if (channelId) {
       addUserToChannel({
         variables: {
@@ -157,22 +181,30 @@ const Channels = (props) => {
         },
       });
     } else {
-      addUserToChannel({
-        variables: {
-          name: `${selectedUser.name}, ${user.name}`,
-          owner: user.email,
-          email: selectedUser.email,
-        },
-      });
+      if (
+        !directMessages.find(
+          (i) =>
+            i.name === `${selectedUser.name}, ${user.name}` ||
+            i.name === `${user.name}, ${selectedUser.name}`,
+        )
+      ) {
+        addUserToChannel({
+          variables: {
+            name: `${selectedUser.name}, ${user.name}`,
+            owner: user.email,
+            email: selectedUser.email,
+          },
+        });
+      }
     }
     toggleModalDirectMessages(false);
   };
 
   const handleChangeUser = (event) => {
-    setUser(event.target.value);
+    setUserId(event.target.value);
   };
 
-  console.log('notificationId', notificationIds);
+  console.log('notificationId', selectedUserId);
   return (
     <div className={classes.container}>
       <Navbar userName={`${user.name} ${user.surname}`} />
@@ -369,13 +401,13 @@ const Channels = (props) => {
               <Select
                 labelId="demo-simple-select-outlined-label"
                 id="demo-simple-select-outlined"
-                value={selectedUser._id}
+                value={selectedUserId || ''}
                 onChange={handleChangeUser}
                 label="User"
               >
                 {filteredAllUsers.length
                   ? filteredAllUsers.map((u) => (
-                      <MenuItem value={u} key={u}>{`${u.name} ${u.surname}`}</MenuItem>
+                      <MenuItem value={u._id} key={u._id}>{`${u.name} ${u.surname}`}</MenuItem>
                     ))
                   : []}
               </Select>

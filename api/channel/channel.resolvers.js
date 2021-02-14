@@ -47,6 +47,7 @@ const addPeopleToChannel = async (_, { input }, ctx) => {
     { users },
     { new: true },
   );
+  ctx.pubsub.publish('NEW_USER_ADDED_TO_CHANNEL_TRIGGER', { newUserAddedToChannel: channel  });
   return channel;
 };
 const channels = async (_, { userId }, ctx) => {
@@ -70,5 +71,12 @@ module.exports = {
     users: async (channel, args, ctx) => await ctx.loader.loaderChannelUsers().load(channel.users),
     posts: async (channel, args, ctx) =>
       await ctx.loader.loaderChannelPosts().load({ id: channel._id, args }),
+  },
+  Subscription: {
+    newUserAddedToChannel: {
+      subscribe(_, args, { pubsub }) {
+        return pubsub.asyncIterator('NEW_USER_ADDED_TO_CHANNEL_TRIGGER');
+      },
+    },
   },
 };

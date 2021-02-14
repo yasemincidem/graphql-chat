@@ -16,6 +16,7 @@ export const useStyles = makeStyles((theme) => ({
     position: 'relative',
     overflow: 'auto',
     maxHeight: 874,
+    borderRadius: 0,
   },
   paper2: {
     height: '874px',
