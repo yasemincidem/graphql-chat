@@ -136,6 +136,7 @@ const Channels = (props) => {
   };
 
   const selectChannel = (channelId) => {
+    setNotificationId(notificationIds.filter((item) => item.to !== channelId));
     setChannel(channelId);
   };
 
@@ -177,19 +178,27 @@ const Channels = (props) => {
       <Navbar userName={`${user.name} ${user.surname}`} />
       <Grid container>
         <Grid item xs={2}>
-          <Card className={classes.paper} style={{ backgroundColor: '#880e4f' }}>
+          <Card className={classes.paper} style={{ backgroundColor: 'rgb(97 68 94)' }}>
             <List component="nav" aria-labelledby="nested-list-subheader" className={classes.root}>
               <ListItem>
                 <ListItem button onClick={handleClick} className={classes.clickableIcons}>
-                  {open ? <ExpandLess /> : <ExpandMore />}
+                  {open ? (
+                    <ExpandLess style={{ color: 'rgb(211, 203, 210)' }} />
+                  ) : (
+                    <ExpandMore style={{ color: 'rgb(211, 203, 210)' }} />
+                  )}
                 </ListItem>
-                <ListItemText primary="Channels" />
+                <ListItemText
+                  primary="Channels"
+                  disableTypography
+                  className={classes.drawerItems}
+                />
                 <ListItem
                   button
                   className={classes.clickableIcons}
                   onClick={() => toggleModal(true)}
                 >
-                  <Add />
+                  <Add style={{ color: 'rgb(211, 203, 210)' }} />
                 </ListItem>
               </ListItem>
               <Collapse in={open} timeout="auto" unmountOnExit>
@@ -199,16 +208,30 @@ const Channels = (props) => {
                       button
                       onClick={() => selectChannel(channel._id)}
                       selected={channelId === channel._id}
-                      style={{
-                        backgroundColor: notificationIds.find(
-                          (i) => i.to === channel._id && i.from !== user._id,
-                        )
-                          ? 'red'
-                          : 'transparent',
-                      }}
+                      style={
+                        channelId === channel._id
+                          ? { backgroundColor: 'rgb(140, 88, 136)' }
+                          : { backgroundColor: 'transparent' }
+                      }
                       key={channel._id}
                     >
-                      <ListItemText primary={`#\t${channel.name}`} />
+                      <ListItemText
+                        secondary={`#\t${channel.name}`}
+                        disableTypography
+                        className={classes.drawerItems}
+                        style={{
+                          color: notificationIds.find(
+                            (i) => i.to === channel._id && i.from !== user._id,
+                          )
+                            ? 'white'
+                            : 'rgb(211,203,210)',
+                          fontWeight: notificationIds.find(
+                            (i) => i.to === channel._id && i.from !== user._id,
+                          )
+                            ? 'bold'
+                            : '400',
+                        }}
+                      />
                     </ListItem>
                   ))}
                 </List>
@@ -221,15 +244,23 @@ const Channels = (props) => {
                   onClick={handleClickDirectMessages}
                   className={classes.clickableIcons}
                 >
-                  {openDirectMessages ? <ExpandLess /> : <ExpandMore />}
+                  {openDirectMessages ? (
+                    <ExpandLess style={{ color: 'rgb(211, 203, 210)' }} />
+                  ) : (
+                    <ExpandMore style={{ color: 'rgb(211, 203, 210)' }} />
+                  )}
                 </ListItem>
-                <ListItemText primary="Direct Messages" />
+                <ListItemText
+                  primary="Direct Messages"
+                  disableTypography
+                  className={classes.drawerItems}
+                />
                 <ListItem
                   button
                   className={classes.clickableIcons}
                   onClick={() => toggleModalDirectMessages(true)}
                 >
-                  <Add />
+                  <Add style={{ color: 'rgb(211, 203, 210)' }} />
                 </ListItem>
               </ListItem>
               <Collapse in={openDirectMessages} timeout="auto" unmountOnExit>
@@ -237,18 +268,32 @@ const Channels = (props) => {
                   {directMessages.map((channel) => (
                     <ListItem
                       button
+                      style={
+                        channelId === channel._id
+                          ? { backgroundColor: 'rgb(140, 88, 136)' }
+                          : { backgroundColor: 'transparent' }
+                      }
                       onClick={() => selectChannel(channel._id)}
                       selected={channelId === channel._id}
                       key={channel._id}
-                      style={{
-                        backgroundColor: notificationIds.find(
-                          (i) => i.to === channel._id && i.from !== user._id,
-                        )
-                          ? 'red'
-                          : 'transparent',
-                      }}
                     >
-                      <ListItemText primary={`#\t${channel.name}`} />
+                      <ListItemText
+                        secondary={`#\t${channel.name}`}
+                        disableTypography
+                        className={classes.drawerItems}
+                        style={{
+                          color: notificationIds.find(
+                            (i) => i.to === channel._id && i.from !== user._id,
+                          )
+                            ? 'white'
+                            : 'rgb(211,203,210)',
+                          fontWeight: notificationIds.find(
+                            (i) => i.to === channel._id && i.from !== user._id,
+                          )
+                            ? 'bold'
+                            : '400',
+                        }}
+                      />
                     </ListItem>
                   ))}
                 </List>

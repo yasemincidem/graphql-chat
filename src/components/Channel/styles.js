@@ -84,6 +84,12 @@ export const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     marginTop: '50%',
   },
+  drawerItems: {
+    color: 'rgb(211, 203, 210)',
+    fontWeight: 400,
+    fontSize: 15,
+    fontFamily: 'Slack-Lato, appleLogo, sans-serif',
+  },
 }));
 export const ValidationTextField = withStyles({
   root: {

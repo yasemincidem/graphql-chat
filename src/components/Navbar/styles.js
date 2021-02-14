@@ -4,6 +4,11 @@ export const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
   },
+  appBar: {
+    background: '#452842',
+    color: '#FFFFFF',
+    boxShadow: '0 1px 0 0 rgb(255 255 255 / 10%)',
+  },
   menuButton: {
     marginRight: theme.spacing(2),
   },
