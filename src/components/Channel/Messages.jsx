@@ -218,7 +218,7 @@ const Messages = (props) => {
             ? messages
                 .sort((a, b) => a.created_at - b.created_at)
                 .map((message, index) => (
-                  <Message index={index} message={message} classes={classes} />
+                  <Message index={index} message={message} classes={classes} key={index} />
                 ))
             : null}
         </List>
