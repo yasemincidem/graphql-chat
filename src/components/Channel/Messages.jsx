@@ -177,7 +177,7 @@ const Messages = (props) => {
   return (
     <div className={classes.buttonWrapper}>
       <div className={classes.messagesGroup} ref={messageEl}>
-        {loadingMessages === true ? <CircularProgress color="secondary" /> : null}
+        {loadingMessages === true ? <div className={classes.loadingMessages}><CircularProgress color="primary" /></div> : null}
         <div
           style={{
             flexDirection: 'row',

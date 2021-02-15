@@ -11,16 +11,17 @@ import {
   FormControl,
   Button,
   Dialog,
+  CircularProgress,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@material-ui/core';
 import { ExpandLess, ExpandMore, Add } from '@material-ui/icons';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useStyles } from './styles';
 import Messages from './Messages';
 import Navbar from '../Navbar';
-import InputLabel from '@material-ui/core/InputLabel/InputLabel';
-import Select from '@material-ui/core/Select/Select';
-import MenuItem from '@material-ui/core/MenuItem/MenuItem';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 export const CHANNELS_QUERY = gql`
   query channels($userId: String!, $before: String) {
@@ -138,8 +139,12 @@ const Channels = (props) => {
       },
     });
   }, []);
-
-  if (loading) return <div>Channels loading ...</div>;
+  if (loading)
+    return (
+      <div className={classes.channelLoading}>
+        <CircularProgress color="primary" />
+      </div>
+    );
   if (error) return <div>Error in fetching channels</div>;
 
   const allChannels =
