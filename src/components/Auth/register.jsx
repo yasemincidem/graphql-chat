@@ -46,6 +46,7 @@ const Register = () => {
     if (data && Object.keys(data).length) {
       localStorage.setItem('token', data.signup.token);
       history.push('/channels', {params: data.signup.user});
+      history.go();
     }
   }, [data && Object.keys(data).length]);
 

@@ -211,6 +211,7 @@ const Channels = (props) => {
     setUserId(event.target.value);
   };
 
+  console.log('channel');
   return (
     <div className={classes.container}>
       <Navbar userName={`${user.name} ${user.surname}`} />

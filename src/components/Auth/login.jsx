@@ -50,6 +50,7 @@ const Login = () => {
     if (data && Object.keys(data).length) {
       localStorage.setItem('token', data.login.token);
       history.push('/channels', {params: data.login.user});
+      history.go();
     }
   }, [data && Object.keys(data).length]);
 
