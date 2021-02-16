@@ -83,7 +83,6 @@ export const useStyles = makeStyles((theme) => ({
   channelNotFound: {
     fontSize: 30,
     textAlign: 'center',
-    marginTop: '50%',
   },
   drawerItems: {
     color: 'rgb(211, 203, 210)',
@@ -99,5 +98,9 @@ export const useStyles = makeStyles((theme) => ({
   loadingMessages: {
     display: 'flex',
     justifyContent: 'center',
-  }
+  },
+  errorChannelName: {
+    color: 'red',
+    marginBottom: 20,
+  },
 }));

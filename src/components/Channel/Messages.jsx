@@ -102,6 +102,7 @@ const Messages = (props) => {
 
   const channel =
     data && data.channels.length ? data.channels.find((channel) => channel._id === channelId) : {};
+
   const messages =
     channel && Object.keys(channel).length ? channel.posts.edges.map((i) => i.node) : [];
   const pageInfo = channel && Object.keys(channel).length ? channel.posts.pageInfo : {};
@@ -234,12 +235,12 @@ const Messages = (props) => {
         onClose={() => toggleAllUsersOfChannel(false)}
       >
         <div className={classes.paperModal}>
-          <h2 id="transition-modal-title">{`${channel && channel.users.length} members in #${
+          <h2 id="transition-modal-title">{`${channel && channel.users && channel.users.length} members in #${
             channel && channel.name
           }`}</h2>
           <div style={{ marginTop: '5%' }}>
             <FormControl variant="outlined" fullWidth>
-              {channel && channel.users.length
+              {channel && channel.users && channel.users.length
                 ? channel.users.map((u) => <div key={u._id}>{`${u.name} ${u.surname}`}</div>)
                 : []}
             </FormControl>

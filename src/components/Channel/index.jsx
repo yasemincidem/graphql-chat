@@ -76,7 +76,9 @@ const Channels = (props) => {
         </Grid>
         <Grid item xs={10}>
           <Card className={classes.paper2}>
-            {!channelId && <div className={classes.channelNotFound}>Channel is not found</div>}
+            {!(directMessages.length || allChannels.length) && (
+              <div className={classes.channelNotFound}>Channel is not found</div>
+            )}
             {channelId && (
               <Messages
                 user={props.location?.state?.params || ''}
@@ -114,6 +116,7 @@ const Channels = (props) => {
         toggleModal={(item) => toggleModal(item)}
         setChannelName={(name) => setChannelName(name)}
         setDescriptionName={(name) => setDescriptionName(name)}
+        channels={data.channels}
       />
       <AddNewUser
         classes={classes}
