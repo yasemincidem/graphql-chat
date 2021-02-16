@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Grid, Card, CircularProgress } from '@material-ui/core';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,7 +8,7 @@ import Messages from './Messages';
 import Navbar from '../Navbar';
 import Drawer from './Drawer';
 import CreateChannel from './CreateChannel';
-import { CHANNELS_QUERY, NEW_USER_ADDED_SUBSCRIPTION } from './queryAndMutations';
+import { CHANNELS_QUERY, CREATE_CHANNEL, NEW_USER_ADDED_SUBSCRIPTION } from './queryAndMutations';
 import AddNewUser from './AddNewUser';
 
 const Channels = (props) => {
@@ -25,6 +25,18 @@ const Channels = (props) => {
   const { loading, error, data, fetchMore, subscribeToMore } = useQuery(CHANNELS_QUERY, {
     variables: { userId: user._id },
   });
+  let [createChannel, { loading: loadingCreateChannel, error: errorCreateChannel }] = useMutation(
+    CREATE_CHANNEL,
+    {
+      refetchQueries: [{ query: CHANNELS_QUERY, variables: { userId: user._id } }],
+    },
+  );
+
+  useEffect(() => {
+    if (errorCreateChannel && Object.keys(errorCreateChannel).length) {
+      toast.error(errorCreateChannel.message);
+    }
+  }, [errorCreateChannel && Object.keys(errorCreateChannel).length]);
 
   useEffect(() => {
     subscribeToMore({
@@ -38,6 +50,7 @@ const Channels = (props) => {
       },
     });
   }, []);
+
   if (loading)
     return (
       <div className={classes.channelLoading}>
@@ -117,6 +130,7 @@ const Channels = (props) => {
         setChannelName={(name) => setChannelName(name)}
         setDescriptionName={(name) => setDescriptionName(name)}
         channels={data.channels}
+        createChannel={(variables) => createChannel(variables)}
       />
       <AddNewUser
         classes={classes}

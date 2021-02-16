@@ -1,7 +1,5 @@
 import React from 'react';
 import { Button, Dialog, FormControl, TextField } from '@material-ui/core';
-import { useMutation } from '@apollo/client';
-import { CREATE_CHANNEL, CHANNELS_QUERY } from './queryAndMutations';
 
 const CreateChannel = (props) => {
   const {
@@ -14,10 +12,8 @@ const CreateChannel = (props) => {
     setChannelName,
     setDescriptionName,
     channels,
+    createChannel,
   } = props;
-  const [createChannel] = useMutation(CREATE_CHANNEL, {
-    refetchQueries: [{ query: CHANNELS_QUERY, variables: { userId: user._id } }],
-  });
 
   const createNewChannel = () => {
     createChannel({
@@ -32,7 +28,7 @@ const CreateChannel = (props) => {
         <h2 id="transition-modal-title">Create Channel</h2>
         <FormControl fullWidth>
           {channels.find((channel) => channel.name === channelName) ? (
-            <div className={classes.errorChannelName}>That name is already taken by a channel</div>
+            <div className={classes.errorChannelName}>That name is already taken by current user</div>
           ) : null}
           <TextField
             id="channel-name"
