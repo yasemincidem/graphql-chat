@@ -21,6 +21,7 @@ Chat application using React, Node and Graphql.
 - `eslint` and `prettier`
 
 ## Demo:
+![alt tag](demo.gif)
 
 ### Setting up MongoDB
 
