@@ -73,7 +73,7 @@ const Channels = (props) => {
     <div className={classes.container}>
       <Navbar userName={`${user.name} ${user.surname}`} />
       <Grid container>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <Drawer
             classes={classes}
             setNotificationId={(item) => setNotificationId(item)}
@@ -87,7 +87,7 @@ const Channels = (props) => {
             channelId={channelId}
           />
         </Grid>
-        <Grid item xs={10}>
+        <Grid item xs={9}>
           <Card className={classes.paper2}>
             {!(directMessages.length || allChannels.length) && (
               <div className={classes.channelNotFound}>Channel is not found</div>
